@@ -1,4 +1,4 @@
-# Krabs
+# Krabbs
 
 Main code for the year 2021-2022.
 
