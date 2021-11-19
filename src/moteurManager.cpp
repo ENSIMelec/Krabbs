@@ -90,8 +90,7 @@ void MoteurManager::apply()
 	data[3] = sensDroite;
 
 	// Envoi du tableau de deux octets
-	if(dummy == false && !dummyBlocage)
-		write(i2c_fd, data, 4);
+	if(dummy == false && !dummyBlocage) write(i2c_fd, data, 4);
 }
 
 // Getters

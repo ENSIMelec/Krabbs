@@ -1,3 +1,9 @@
+# Projects
+.idea
+
+# Folders
+build
+
 # Prerequisites
 *.d
 

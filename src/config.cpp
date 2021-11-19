@@ -11,7 +11,11 @@ void Config::loadFromFile(string filename)
 	pt::ptree tree;
 
 	// Chargement depuis un fichier au format INFO
-	pt::read_info(filename, tree);
+    try {
+        pt::read_info(filename, tree);
+    } catch (const pt::ptree_error &error) {
+        cout << error.what() << endl;
+    }
 
 	// Lecture des attributs depuis le fichier de configuration
 	delta_asserv = tree.get<int>("asservissement.delta_asserv");
@@ -22,6 +26,7 @@ void Config::loadFromFile(string filename)
 	pid_kiA = tree.get<double>("asservissement.pid_kia");
 	pid_kdA = tree.get<double>("asservissement.pid_kda");
 
+	pid_kpdepPathFinding = tree.get<double>("asservissement.pid_kpdepPathFinding");
 	pid_kpDep = tree.get<double>("asservissement.pid_kpdep");
 	pid_kiDep = tree.get<double>("asservissement.pid_kidep");
 	pid_kdDep = tree.get<double>("asservissement.pid_kddep");
@@ -44,14 +49,17 @@ void Config::loadFromFile(string filename)
 
 	CoeffGLong = tree.get<double>("asservissement.CoeffGLong");
 	CoeffDLong = tree.get<double>("asservissement.CoeffDLong");
-	CoeffAngl = tree.get<double>("asservissement.CoeffAngl");
-    CoeffCorrecteur = tree.get<double>("asservissement.CoeffCorrecteur");
+	CoeffAnglD = tree.get<double>("asservissement.CoeffAnglD");
+	CoeffAnglG = tree.get<double>("asservissement.CoeffAnglG");
 
 	I2C_SERVOS = tree.get<int>("asservissement.I2C_SERVOS");
 	I2C_LANCEUR = tree.get<int>("asservissement.I2C_LANCEUR");
 	I2C_MOTEURS = tree.get<int>("asservissement.I2C_MOTEURS");
+	I2C_STEPPER = tree.get<int>("asservissement.I2C_STEPPER");
 
 	temps_match = tree.get<int>("asservissement.temps_match");
+
+	WAIT_DEVICES_CONNECTIONS = tree.get<bool>("asservissement.WAIT_DEVICES_CONNECTIONS");
 
 	ipServeur = tree.get<string>("asservissement.ipServeur");
 	port = tree.get<int>("asservissement.port");
@@ -69,6 +77,7 @@ double Config::getPIDkpA() const { return pid_kpA; }
 double Config::getPIDkiA() const { return pid_kiA; }
 double Config::getPIDkdA() const { return pid_kdA; }
 
+double Config::getPIDkpDepPathfinding() const { return pid_kpdepPathFinding; }
 double Config::getPIDkpDep() const { return pid_kpDep; }
 double Config::getPIDkiDep() const { return pid_kiDep; }
 double Config::getPIDkdDep() const { return pid_kdDep; }
@@ -91,15 +100,17 @@ double Config::getPIDkdVHigh() const { return pid_kdV_high; }
 
 double Config::getCoeffGLong() const { return CoeffGLong; }
 double Config::getCoeffDLong() const { return CoeffDLong; }
-double Config::getCoeffAngl() const { return CoeffAngl; }
-double Config::getCoeffCorrecteur() const { return CoeffCorrecteur; }
+double Config::getCoeffAnglD() const { return CoeffAnglD; }
+double Config::getCoeffAnglG() const { return CoeffAnglG; }
 
-int Config::get_I2C_SERVOS() const {return I2C_SERVOS; }
-int Config::get_I2C_LANCEUR() const {return I2C_LANCEUR; }
-int Config::get_I2C_MOTEURS() const {return I2C_MOTEURS; }
-
+int Config::get_I2C_SERVOS() const { return I2C_SERVOS; }
+int Config::get_I2C_LANCEUR() const { return I2C_LANCEUR; }
+int Config::get_I2C_MOTEURS() const { return I2C_MOTEURS; }
+int Config::get_I2C_STEPPER() const { return I2C_STEPPER; }
 
 int Config::get_temps_match() const { return temps_match; }
+
+bool Config::get_WAIT_DEVICES_CONNECTIONS() const { return WAIT_DEVICES_CONNECTIONS; }
 
 void Config::afficherConfig() const {
 	cout << endl << "--- CONFIGURATION ---" << endl;
@@ -112,7 +123,7 @@ void Config::afficherConfig() const {
 
 	cout << "Coefficients : " << endl;
 	cout << "-Longueur :" << endl << "\tGauche : " << getCoeffGLong() << endl << "\tDroite : " << getCoeffDLong() << endl;
-	cout << "-Angle : "<< getCoeffAngl()<< endl;
+	cout << "-Angle Droite: "<< getCoeffAnglD()<< "Angle Gauche" << getCoeffAnglG() << endl;
 
 	cout << "PID : " << endl;
 	cout << "-Vitesse faible:" << endl << "\tP = " << getPIDkpVLow() << endl << "\tI = " << getPIDkiVLow() << endl << "\tD = " << getPIDkdVLow() << endl;
