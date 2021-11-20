@@ -1,0 +1,13 @@
+- name: Doxygenize
+  # You may pin to the exact commit or the version.
+  #uses: langroodi/doxygenize@4186fba316b72a7d790b1fff255f6a1dabc1db31
+  uses: langroodi/doxygenize@v1.4
+  with:
+    # Doxygen configuration file path
+    doxygenconf: ./Doxyfile
+    # Generated HTML documents output folder
+    htmloutput: ./docs/
+    # GitHub Pages branch name
+    ghpagesbranch: gh-pages
+    # GitHub Pages directory path
+    ghpagesdir: ./
