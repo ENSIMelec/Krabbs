@@ -12,7 +12,7 @@ jobs:
     - name: Doxygenize
       uses: langroodi/doxygenize@v1.4
       with:
-        doxygenconf: ./docs/Doxygen
+        doxygenconf: ./docs/Doxygen.conf
         # Generated HTML documents output folder
         htmloutput: ./docs/build
         # GitHub Pages branch name
