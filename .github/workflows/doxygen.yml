@@ -1,0 +1,21 @@
+name: Doxygen Documentation
+
+on:
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Doxygenize
+      uses: langroodi/doxygenize@v1.4
+      with:
+        doxygenconf: ./Doxyfile
+        # Generated HTML documents output folder
+        htmloutput: ./docs/
+        # GitHub Pages branch name
+        ghpagesbranch: gh-pages
+        # GitHub Pages directory path
+        ghpagesdir: ./
