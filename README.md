@@ -17,15 +17,15 @@ root
 ## How to run it ?
 
 1. Clone this repository
-```
+```bash
 git clone https://github.com/ENSIMelec/Krabbs.git
 ```
 2. Do some coding !
 
 3. Connect to the Raspberry
 
-To connection is made using SSH. Once the robot is powered and ready, connect to the WIFI and run the following command :
-```
+The connection is made using SSH. Once the robot is powered and ready, connect to the WIFI and run the following command :
+```bash
 ssh pi@robot
 ```
 
@@ -34,13 +34,14 @@ ssh pi@robot
 5. Go inside the root folder
 
 6. Build the program
-The program is built with a Makefile. Use the following command :
-```
+
+The program is built with a Makefile using the following command :
+```bash
 make
 ```
 
 7. Run the program
-```
+```bash
 ./build/bin/krabbs
 ```
 
