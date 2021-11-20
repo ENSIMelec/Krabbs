@@ -12,10 +12,10 @@ jobs:
     - name: Doxygenize
       uses: langroodi/doxygenize@v1.4
       with:
-        doxygenconf: docs/Doxygen
+        doxygenconf: ./docs/Doxygen
         # Generated HTML documents output folder
-        htmloutput: docs/build
+        htmloutput: ./docs/build
         # GitHub Pages branch name
-        ghpagesbranch: gh-pages
+        ghpagesbranch: ./gh-pages
         # GitHub Pages directory path
         ghpagesdir: ./
