@@ -10,21 +10,28 @@
 
 class TestMovement : Test {
 
-public:
+private:
     // --- Variables ---
     MotorManager motorManager;
 
+public:
     // --- Methods ---
     TestMovement(MotorManager motorManager) : motorManager(motorManager) {};
 
     /// @brief Execute all tests
     bool test();
 
+    /// @brief Go forward for 1 second
     bool testGoForward();
-    bool testTurnRight();
-    bool testTurnLeft();
-    bool testGoBackward();
 
+    /// @brief Turn left for 1 second
+    bool testTurnRight();
+
+    /// @brief Turn right for 1 second
+    bool testTurnLeft();
+
+    /// @brief Go backward for 1 second
+    bool testGoBackward();
 };
 
 #endif //KRABBS_TESTMOVEMENT_H

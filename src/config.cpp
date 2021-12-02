@@ -1,8 +1,6 @@
 #include "Config.h"
-#include "Config.h"
 
 using namespace std;
-
 // Shortcut for namespace
 namespace pt = boost::property_tree;
 
@@ -65,14 +63,16 @@ void Config::loadFromFile(string filename)
 	ipServeur = tree.get<string>("asservissement.ipServeur");
 	port = tree.get<int>("asservissement.port");
 
+#ifdef DEBUG_CONFIG
     // Display the config
 	printConfig();
+#endif
 }
 
 int Config::getDeltaAsserv() const { return delta_asserv; }
 int Config::getNbAX12() const { return nbAX12; }
 
-string Config::getIpServeur() const { return ipServeur; }
+string Config::getIpServer() const { return ipServeur; }
 int Config::getPort() const { return port; }
 
 double Config::getPIDkpA() const { return pid_kpA; }
@@ -118,7 +118,7 @@ void Config::printConfig() const {
 	cout << endl << "--- CONFIGURATION ---" << endl;
 	cout << "Temps du match : " << get_temps_match() << endl;
 
-	cout << "Ip serveur : " << getIpServeur() << endl;
+	cout << "Ip serveur : " << getIpServer() << endl;
 	cout << "Port serveur : " << getPort() << endl;
 	cout << "Temps minimum entre deux appels d'asservissement : " << getDeltaAsserv() << endl << endl;
 	cout << "Nombre d'AX12 à connecter : " << getNbAX12() << endl;

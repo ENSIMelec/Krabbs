@@ -1,28 +1,15 @@
 #include "MotorManager.h"
 
+// Uncomment to go in debug mod
+//#define DEBUG_MOTOR_MANAGER
+
 using namespace std;
 
-// Constructeur par défaut : on stoppe les moteurs
+// We don't have to initialize the motor to a stopped position because the Arduino already does it
 MotorManager::MotorManager(int i2c) {
-    leftSpeed = 0;
-    rightSpeed = 0;
-
-    leftMotorState = STOPPED;
-    rightMotorState = STOPPED;
-
     i2c_fd = i2c;
-
-    sendData();
 }
 
-/*
-L'arduino va recevoir des valeurs entre 0 et 255 pour la commande de PWM (vitesse)
-Une fois à la suite pour chaque roue
-Puis elle reçoit également le sens (1 = marche avant // 2 = marche arrière // 0 = arrêt des moteurs)
-Elle va alors changer IN1/IN2 en fonction du sens, et ENA en fonction de la commande
-*/
-
-/// @brief Load the order for the motors
 void MotorManager::setOrder(int leftOrder, int rightOrder) {
 
     // We don't want values that are outside the range -255 to 255
@@ -39,69 +26,53 @@ void MotorManager::setOrder(int leftOrder, int rightOrder) {
     sendData();
 }
 
-/// @brief Shortcut to go forward
-void MotorManager::forward() { //Fait forward le robot
-    setOrder(10, 10);
+void MotorManager::forward(int speed) { //Fait forward le robot
+    setOrder(speed, speed);
 	return;
 }
 
-/// @brief Shortcut to go backward
-void MotorManager::backward() { //Fait backward le robot
-    setOrder(-100, -100);
+void MotorManager::backward(int speed) { //Fait backward le robot
+    setOrder(-speed, -speed);
 	return;
 }
 
-/// @brief Cap the value between -255 and 255
 void MotorManager::capPWM(int *PWM) {
 	if(*PWM < -255)	*PWM = -255;
 	else if(*PWM > 255) *PWM = 255;
 }
 
-/// @brief Stop all the motors
 void MotorManager::stop()
 {
     leftSpeed = 0;
     rightSpeed = 0;
     leftMotorState = STOPPED;
     rightMotorState = STOPPED;
+
     sendData();
 }
 
-/// @brief Send the data using I2C
 void MotorManager::sendData()
 {
     // The bytes we will send
 	uint8_t data[4];
 
-	data[0] = leftSpeed;
-	data[1] = rightSpeed;
-	data[2] = motorStateToInt(leftMotorState);
-	data[3] = motorStateToInt(rightMotorState);
+	data[0] = (uint8_t) leftSpeed;
+	data[1] = (uint8_t) rightSpeed;
+	data[2] = (uint8_t) motorStateToInt(leftMotorState);
+	data[3] = (uint8_t) motorStateToInt(rightMotorState);
+
+#ifdef DEBUG_MOTOR_MANAGER
+    cout << "Printing the content of data :" << endl;
+    cout << "data[0] : " << unsigned(data[0]) << endl;
+    cout << "data[1] : " << unsigned(data[1]) << endl;
+    cout << "data[2] : " << unsigned(data[2]) << endl;
+    cout << "data[3] : " << unsigned(data[3]) << endl;
+#endif
 
 	// Sending the byte array
 	write(i2c_fd, data, 4);
 }
 
-/**
- * Simple debug function
- */
-void MotorManager::debug() {
-
-    uint8_t data[4];
-
-    data[0] = 0;
-    data[1] = 0;
-    data[2] = 0;
-    data[3] = 0;
-
-    write(i2c_fd, data, 4);
-}
-
-/** @brief Convert the motor status to an integer value
- * 0 : STOPPED
- * 1 : FORWARD
- * 2 : BACKWARD
- */
 uint8_t MotorManager::motorStateToInt(MotorState status) {
     uint8_t value;
 
@@ -117,15 +88,9 @@ uint8_t MotorManager::motorStateToInt(MotorState status) {
             break;
     }
 
-    return value;
+    return (uint8_t) value;
 }
 
-/**
- * @brief Get the motor state from the command value
- * Negative : BACKWARD
- * Positive : FORWARD
- * Null : STOPPED
- */
 MotorState MotorManager::getStateFromSign(int order) {
     MotorState status;
 

@@ -6,25 +6,32 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 
+// TODO : clean this file
+
+// Uncomment to go in debug mod
+//#define DEBUG_CONFIG
+
 class Config
 {
 public:
 
-	/// @brief Load the configuration from a file
-	///
-	/// @param filename Path to the config file (.info)
+	/**
+	 * @brief Load the configuration from a file
+	 * @param filename Path to the config file (.info)
+	 */
 	void loadFromFile(std::string filename);
 
     /// @brief Print the configuration to the console
 	void printConfig() const;
 
-    /// @brief Get the waiting time between each call to the asserv call
-	///
-	/// @return Delta time in milliseconds
+    /**
+     * @brief Get the waiting time between each call to the asserv call
+     * @return Delta time in milliseconds
+     */
 	int getDeltaAsserv() const;
 	int getNbAX12() const;
 
-	std::string getIpServeur() const;
+	std::string getIpServer() const;
 	int getPort() const;
 
 	double getPIDkpA() const;
@@ -67,7 +74,7 @@ public:
 	bool get_WAIT_DEVICES_CONNECTIONS() const;
 
 private:
-	// Attributs
+	// Attributes
 	int delta_asserv;
 	int nbAX12;
 

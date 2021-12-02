@@ -2,43 +2,58 @@
 // Created by Tom on 23/11/2021.
 //
 
-#include <unistd.h>
+using namespace std;
 
-#include "TestMovement.h"
+#include <unistd.h>
+#include <thread>
+
+#include "Utils.h"
+
 #include "TestMovement.h"
 
 bool TestMovement::test() {
-    // All tests have to return true
+    cout << "Testing the movement :" << endl;
     return testGoForward() && testGoBackward() && testTurnLeft() && testTurnRight();
 }
 
-/// @brief Go forward for 1 second
 bool TestMovement::testGoForward() {
+    cout << "Testing : go Forward" << endl;
 
-    motorManager.forward();
-    usleep(1000);
+    motorManager.forward(50);
+    Utils::sleepMillis(1000);
     motorManager.stop();
 
     return true;
 }
 
 bool TestMovement::testTurnRight() {
-    //motorManager.turnRight(90);
-    return true;
-}
+    cout << "Testing : turn right" << endl;
 
-bool TestMovement::testTurnLeft() {
-    //motorManager.turnLeft(90);
-    return true;
-}
-
-/// @brief Go backward for 1 second
-bool TestMovement::testGoBackward() {
-
-    motorManager.backward();
-    usleep(1000);
+    motorManager.setOrder(40, -40);
+    Utils::sleepMillis(1000);
     motorManager.stop();
 
     return true;
 }
 
+bool TestMovement::testTurnLeft() {
+
+    cout << "Testing : turn left" << endl;
+
+    motorManager.setOrder(-40, 40);
+    Utils::sleepMillis(1000);
+    motorManager.stop();
+
+    return true;
+}
+
+bool TestMovement::testGoBackward() {
+
+    cout << "Testing : go backward" << endl;
+
+    motorManager.backward(50);
+    Utils::sleepMillis(1000);
+    motorManager.stop();
+
+    return true;
+}
