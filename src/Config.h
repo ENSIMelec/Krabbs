@@ -10,14 +10,17 @@ class Config
 {
 public:
 
-	/// @brief Charge la configuration depuis un fichier
+	/// @brief Load the configuration from a file
 	///
-	/// @param filename Chemin du fichier de config (.info)
+	/// @param filename Path to the config file (.info)
 	void loadFromFile(std::string filename);
-	void afficherConfig() const;
-	/// @brief Retourne le temps d’attente entre chaque appel à l’asservissement
+
+    /// @brief Print the configuration to the console
+	void printConfig() const;
+
+    /// @brief Get the waiting time between each call to the asserv call
 	///
-	/// @return Temps d’attente en millisecondes
+	/// @return Delta time in milliseconds
 	int getDeltaAsserv() const;
 	int getNbAX12() const;
 

@@ -3,6 +3,7 @@
 
 # Folders
 build
+cmake-build-krabbs
 
 # Prerequisites
 *.d

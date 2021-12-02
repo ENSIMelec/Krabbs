@@ -1,23 +1,24 @@
 #include "Config.h"
+#include "Config.h"
 
 using namespace std;
 
-// Raccourci de namespace
+// Shortcut for namespace
 namespace pt = boost::property_tree;
 
 void Config::loadFromFile(string filename)
 {
-	// Arbre de configuration
+	// Creating ptree object
 	pt::ptree tree;
 
-	// Chargement depuis un fichier au format INFO
+	// Loading the file using property_tree
     try {
         pt::read_info(filename, tree);
     } catch (const pt::ptree_error &error) {
         cout << error.what() << endl;
     }
 
-	// Lecture des attributs depuis le fichier de configuration
+    // Reading the attributes from the config file
 	delta_asserv = tree.get<int>("asservissement.delta_asserv");
 
 	nbAX12 = tree.get<int>("asservissement.nbAX12");
@@ -64,7 +65,8 @@ void Config::loadFromFile(string filename)
 	ipServeur = tree.get<string>("asservissement.ipServeur");
 	port = tree.get<int>("asservissement.port");
 
-	afficherConfig();
+    // Display the config
+	printConfig();
 }
 
 int Config::getDeltaAsserv() const { return delta_asserv; }
@@ -112,7 +114,7 @@ int Config::get_temps_match() const { return temps_match; }
 
 bool Config::get_WAIT_DEVICES_CONNECTIONS() const { return WAIT_DEVICES_CONNECTIONS; }
 
-void Config::afficherConfig() const {
+void Config::printConfig() const {
 	cout << endl << "--- CONFIGURATION ---" << endl;
 	cout << "Temps du match : " << get_temps_match() << endl;
 

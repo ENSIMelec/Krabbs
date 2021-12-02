@@ -14,7 +14,8 @@
 using namespace std;
 
 #include "Config.h"
-#include "MoteurManager.h"
+#include "MotorManager.h"
+#include "TestMovement.h"
 
 /*********************************** Define ************************************/
 
@@ -34,7 +35,7 @@ void stopSignal(int signal);
 void sleepMillis(int millis);
 char nomFileStrategy[100];
 
-const string RES_PATH = "/home/pi/Codes/krabbs/res/";
+const string RES_PATH = "/home/pi/Documents/Krabbs/res/";
 
 ///////////////////////////// PROGRAMME PRINCIPAL ///////////////////////////////
 int main(int argc, char **argv) {
@@ -56,6 +57,7 @@ int main(int argc, char **argv) {
 	config.loadFromFile(RES_PATH + "config.info"); //Charge la configuration à partir du fichier config.info
     int I2C_MOTEURS = 8;
 
+    cout << "Initializing the I2C" << endl;
 	int i2cM = wiringPiI2CSetup(I2C_MOTEURS);
 
     int i2cS = wiringPiI2CSetup(config.get_I2C_SERVOS());
@@ -66,56 +68,17 @@ int main(int argc, char **argv) {
         return EXIT_FAIL_I2C;
 
     // initialisation du moteur
-	MoteurManager moteurs(i2cM);
+	MotorManager motorManager(i2cM);
+    motorManager.setOrder(200, 0);
 
-    moteurs.avancer();
-    delay(1000);
-    moteurs.stop();
+    sleepMillis(1000);
 
-	cout << "Déclaration et initialisation des variables" << endl;
+    motorManager.stop();
 
-	//argv_contains_dummy(argc, argv); //En fonction des paramètres du main, on active les dummy motors ou non
-
-    // We don't use coders for now
-	// Création du groupement de deux codeurs
-	//SerialCodeurManager codeurs(0);
-	//reset du lancement précédent
-	//codeurs.Closes();
-	//codeurs.Initialisation();
-	delay(100);
-
-    // We don't use server for now
     /*
-    //Setup Connexion udp to Serveur
-    string ipServeur = "127.0.0.1";
-    int portServeur = 80;
-    //ClientUDP client(ipServeur, portServeur);
+    TestMovement testMovement(motorManager);
+    testMovement.test();
     */
-
-    //ActionManager actions(i2cS, i2cSt, config.getNbAX12(), client);
-
-   	//timer temps;
-
-    deltaAsservTimer = config.getDeltaAsserv();
-    //Controller controller(moteurs, config);
-    //Odometry odometry(codeurs);
-
-    // charger les points pour la stratégie
-
-    //Strategie strat(nomFile, argv[1]);
-
-/***************************** Départ du robot *********************************/
-	cout << "Depart du robot" << endl;
-	//codeurs.reset();
-	cout <<"Codeur reset = done"<<endl;
-
-	//jouerMatch(actions);
-
-	if(forcing_stop) {
-		cout << "Forcing stop" << endl;
-	} else {
-		cout << "Arrivee du robot" << endl;
-	}
 
 /************************ Libération de la mémoire *****************************/
 	cout << "Liberation de la memoire" << endl;
