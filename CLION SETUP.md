@@ -12,13 +12,13 @@ In the credential field, configure a new connection using the gear icon.
 
 Add a new SSH Configuration, enter the host and the password.
 
-![Add a new SSH Connection](docs/setup clion/Add a new SSH Connection.png)
+<img src="docs/setup clion/Add a new SSH Connection.png">
 
 Verify that the connection works and that CLION found every tools !
 
 You should get something that looks like that :
 
-![Setup Toolchain](docs/setup clion/Setup Toolchain.png)
+<img src="docs/setup clion/Setup Toolchain.png">
 
 ## Setup CMake
 
@@ -28,7 +28,7 @@ Set the build type to Default and select the previously created Toolchain.
 
 Set the build directory to something like *cmake-build-krabbs*
 
-![Setup CMake](docs/setup clion/Setup CMake.png)
+<img src="docs/setup%20clion/Setup CMake.png">
 
 ## Setup Run Configuration
 
@@ -36,7 +36,7 @@ Go to `Run/Debug Configurations` and add a new *CMake Application* configuration
 
 In the target field, set *krabbs*
 
-![Create Build and Run Configuration](docs/setup clion/Create Build and Run Configuration.png)
+<img src="docs/setup%20clion/Create Build and Run Configuration.png">
 
 You can create an other configuration to simply run the program without rebuilding it.
 
@@ -48,8 +48,8 @@ If you want to switch in which directory the project will be copied on the remot
 
 Select the correct Remote Developement modify the *root path*. 
 
-![Setup Root Path](docs/setup clion/Setup Root Path.png)
+<img src="docs/setup%20clion/Set Root Path.png">
 
 You can go to the *Mapping* tab and modify the deployment path. *
 
-![Setup Root Path](docs/setup clion/Setup Deployment Path.png)
+<img src="docs/setup%20clion/Set Deployment Path.png">
