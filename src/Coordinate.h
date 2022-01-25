@@ -22,7 +22,7 @@
 class Coordinate {
 
 private:
-    static side = YELLOW;
+    int side = YELLOW;
 public:
     // ***** VARIABLES *****
     int x, y;
@@ -33,14 +33,14 @@ public:
 
     // ***** METHODS *****
     /// @brief Initialize on which side the robot is. It is yellow by default
-    static initialize(int currentSide);
+    void initialize(int currentSide);
 
     // ----- Getters & Setters -----
     /// @brief Returns the absolute x position in millimeters
-    getAbsoluteX();
+    int getAbsoluteX();
 
     /// @brief Returns the absolute y position in millimeters
-    getAbsoluteY();
+    int getAbsoluteY();
 };
 
 #endif //KRABBS_COORDINATE_H

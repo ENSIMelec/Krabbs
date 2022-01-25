@@ -22,7 +22,7 @@ int Coordinate::getAbsoluteY() {
     return y;
 }
 
-int Coordinate::initialize(int currentSide) {
+void Coordinate::initialize(int currentSide) {
     if(currentSide == 0) {
         Coordinate::side = YELLOW;
     } else {
