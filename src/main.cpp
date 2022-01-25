@@ -4,8 +4,10 @@
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 
+
 #include "Config.h"
 #include "MotorManager.h"
+#include "Utils.h"
 
 using namespace std;
 
@@ -45,6 +47,10 @@ int main(int argc, char **argv) {
     cout << "done" << endl;
 
     cout << "Start is done !" << endl;
+
+    motorManager.backward(50);
+    Utils::sleepMillis(1000);
+    motorManager.stop();
 
     cout << "-- Quitting the application :" << endl;
 	cout << "Free memory ... ";
