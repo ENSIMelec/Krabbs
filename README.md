@@ -17,4 +17,4 @@ root
 
 ## How to run it ?
 
-See the configuration explanation for CLion remote development [(here)](CLION SETUP.md)
+See the configuration explanation for CLion remote development [(here)](https://github.com/ENSIMelec/Krabbs/blob/develop/CLION%20SETUP.md)
