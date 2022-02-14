@@ -16,7 +16,7 @@ add_executable(krabbs
         src/Coordinate.cpp
         src/Clock.h
         src/Odometry.cpp
-        src/SerialCodeurManager.cpp)
+        src/SerialCodeurManager.cpp src/Point.cpp src/Point.h)
 
 # Linking wiringPi to the binary
 target_link_libraries(krabbs wiringPi)
