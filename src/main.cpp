@@ -60,7 +60,8 @@ int main(int argc, char **argv) {
     Point startingPosition(0, 0, 0);
     Point endPosition(0, 100, 0);
 
-    MotionController motionController();
+    MotionController motionController(motorManager, odometry);
+    motionController.calculateOrders(startingPosition, endPosition);
 
     // This is the main game loop (it last 3 seconds)
     while(totalTime.elapsed_s() < 3) {
@@ -68,11 +69,11 @@ int main(int argc, char **argv) {
         // Check the position at a fixed interval
         if(timeSincePositionCheck.elapsed_ms() > 5) {
 
-            odometry.update();
-            // Display time and position
-            cout << "[" << totalTime.elapsed_ms() << "] " << odometry.getPositionStr() << endl;
+            // Update the order
 
-            motorManager.forward(20);
+            // Display time and position
+            //cout << "[" << totalTime.elapsed_ms() << "] " << odometry.getPositionStr() << endl;
+            motionController.controlMotors();
 
             // Restart the timer
             timeSincePositionCheck.restart();
