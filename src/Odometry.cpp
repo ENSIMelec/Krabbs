@@ -6,7 +6,7 @@
 
 using namespace std;
 
-Odometry::Odometry(SerialCodeurManager codeurs, Config conf) : codeurs(codeurs) {
+Odometry::Odometry(SerialCodeurManager *codeurs, Config conf) : codeurs(codeurs) {
 
     cout << "Initializing Odometry ... ";
 
@@ -34,28 +34,27 @@ void Odometry::update() {
     // Initialize the values on the fist update
     init();
 
-    codeurs.readAndReset();
+    codeurs->readAndReset();
 
-    comptG = codeurs.getLeftTicks();
-    comptD = codeurs.getRightTicks();
+    comptG = codeurs->getLeftTicks();
+    comptD = codeurs->getRightTicks();
 
     ticksG += comptG;
     ticksD += comptD;
 
     //Temps entre deux appelle de ticks
     //Permet le calcul de la vitesse
-    tempsLast = codeurs.getTime();
+    tempsLast = codeurs->getTime();
 
     //cout <<"Data codeur : "<<comptG<<" "<<comptD<<" "<<tempsLast<<endl;
     // Calcul vitesse
     if(tempsLast!=0){
-        vitG = (comptG * CoeffGLong)/(tempsLast*0.000001);
-        vitD = (comptD * CoeffDLong)/(tempsLast*0.000001);
+        leftSpeed = (comptG * CoeffGLong) / (tempsLast * 0.000001);
+        rightSpeed = (comptD * CoeffDLong) / (tempsLast * 0.000001);
     }else{
-        vitG = 0;
-        vitD = 0;
+        leftSpeed = 0;
+        rightSpeed = 0;
     }
-
 
     //Calcul de la distance parcourue
     mesure_dist = (comptD * CoeffDLong + comptG * CoeffGLong) / 2;
@@ -83,16 +82,23 @@ void Odometry::update() {
     }
 }
 
-string Odometry::getPositionStr() {
-    return "X: " + to_string(x) + "\tY: " + to_string(y) + "\tAngle: " + to_string(angle);
-
-}
-
 double Odometry::getX() {
     return x;
 }
 
 double Odometry::getY() {
     return y;
+}
+
+Point Odometry::getPosition() {
+    return Point(x, y, angle);
+}
+
+double Odometry::getLeftSpeed() {
+    return leftSpeed;
+}
+
+double Odometry::getRightSpeed() {
+    return rightSpeed;
 }
 

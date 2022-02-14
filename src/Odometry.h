@@ -8,11 +8,12 @@
 
 #include "SerialCodeurManager.h"
 #include "Config.h"
+#include "Point.h"
 
 class Odometry {
 
 private:
-    SerialCodeurManager codeurs;
+    SerialCodeurManager *codeurs;
 
     //Coefficient tick codeur  -> distance
     double CoeffGLong;
@@ -32,18 +33,21 @@ private:
 
     //Coordonnées actuelles
     double x, y;
-    double vitG = 0, vitD = 0;
+    double leftSpeed = 0, rightSpeed = 0;
 
     bool initialized = false;
 public:
-    Odometry(SerialCodeurManager codeurs, Config config);
+    Odometry(SerialCodeurManager *codeurs, Config config);
     void update();
     void init();
 
-    std::string getPositionStr();
+    Point getPosition();
 
     double getX();
     double getY();
+
+    double getLeftSpeed();
+    double getRightSpeed();
 };
 
 
