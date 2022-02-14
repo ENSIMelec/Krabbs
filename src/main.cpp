@@ -55,13 +55,20 @@ int main(int argc, char **argv) {
     timer timeSincePositionCheck;
 
     SerialCodeurManager serialCodeurManager;
-    Odometry odometry(serialCodeurManager, config);
+    Odometry odometry(&serialCodeurManager, config);
 
     Point startingPosition(0, 0, 0);
     Point endPosition(0, 100, 0);
 
-    MotionController motionController(motorManager, odometry);
+    cout << "Odometry : ref = " << to_string((int) &odometry) << endl;
+
+    MotionController motionController(&motorManager, &odometry);
+    motionController.setDestination(endPosition);
     motionController.calculateOrders(startingPosition, endPosition);
+
+    motorManager.setOrder(20, 20);
+    Utils::sleepMillis(1000);
+    motorManager.stop();
 
     // This is the main game loop (it last 3 seconds)
     while(totalTime.elapsed_s() < 3) {
@@ -69,11 +76,14 @@ int main(int argc, char **argv) {
         // Check the position at a fixed interval
         if(timeSincePositionCheck.elapsed_ms() > 5) {
 
-            // Update the order
+            // Update the position
+            odometry.update();
 
             // Display time and position
-            //cout << "[" << totalTime.elapsed_ms() << "] " << odometry.getPositionStr() << endl;
-            motionController.controlMotors();
+            cout << odometry.getPosition().to_string() << endl;
+
+//            motionController.controlMotors();
+            motorManager.forward(40);
 
             // Restart the timer
             timeSincePositionCheck.restart();

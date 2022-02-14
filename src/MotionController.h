@@ -9,24 +9,34 @@
 #include "MotorManager.h"
 #include "Point.h"
 #include "Odometry.h"
+#include "PID.h"
 
 class MotionController {
 
+    Point destination = {0, 0, 0};
     double distanceOrder, angleOrder;
 
-    MotorManager motorManager;
-    Odometry odometry;
+    PID leftSpeedPID = {1, 0, 0};
+    PID rightSpeedPID = {1, 0, 0};
 
+    MotorManager *motorManager;
+    Odometry *odometry;
+
+    double leftWantedSpeed = 0, rightWantedSpeed = 0;
+    double distanceToDestination = 0;
     double xOrder, yOrder;
 
 public:
 
-    MotionController(MotorManager motorManager, Odometry odometry);
+    MotionController(MotorManager *motorManager, Odometry *odometry);
 
+    void setDestination(Point point);
     void controlMotors();
 
-
+    void calculateWantedSpeeds();
     void calculateOrders(Point startingPoint, Point endPoint);
+
+    double calculateCurrentDistanceFromStart();
 
     // Getters & Setters
     void setOrderXYAngle(double x, double y, double angle) {
