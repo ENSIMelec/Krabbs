@@ -9,7 +9,7 @@
 /* The max speed must be between 0 and 255
  * Be careful when using values over 100
  */
- #define MAX_SPEED 100
+ #define MAX_SPEED 50
 
 /**
  * The Arduino will receive 4 unsigned 8 bit integer values from the i2c bus.
