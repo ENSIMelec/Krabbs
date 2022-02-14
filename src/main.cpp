@@ -4,10 +4,11 @@
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 
-
 #include "Config.h"
 #include "MotorManager.h"
 #include "Utils.h"
+#include "Clock.h"
+#include "Odometry.h"
 
 using namespace std;
 
@@ -48,9 +49,36 @@ int main(int argc, char **argv) {
 
     cout << "Start is done !" << endl;
 
-    motorManager.backward(50);
-    Utils::sleepMillis(1000);
+    timer totalTime;
+    timer timeSincePositionCheck;
+
+    SerialCodeurManager serialCodeurManager;
+    Odometry odometry(serialCodeurManager, config);
+
+    // This is the main game loop
+    while(totalTime.elapsed_s() < 3) {
+
+        // Check the position at a fixed interval
+        if(timeSincePositionCheck.elapsed_ms() > 5) {
+
+            cout << "[" << totalTime.elapsed_ms() << "]" << endl;
+            odometry.update();
+            // Display time and position
+            cout << "[" << totalTime.elapsed_ms() << "] " << odometry.getPositionStr() << endl;
+
+            motorManager.forward(20);
+
+            // Restart the timer
+            timeSincePositionCheck.restart();
+        }
+    }
+
+    cout << "Stopping motors " << endl;
     motorManager.stop();
+
+//    motorManager.forward(50);
+//    Utils::sleepMillis(1000);
+//    motorManager.stop();
 
     cout << "-- Quitting the application :" << endl;
 	cout << "Free memory ... ";

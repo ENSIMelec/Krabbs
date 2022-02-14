@@ -12,8 +12,11 @@ add_executable(krabbs
         src/Config.cpp
         src/MotorManager.cpp
         src/TestMovement.cpp
-        src/Utils.cpp src/Utils.h
-        src/Coordinate.cpp src/Coordinate.h)
+        src/Utils.cpp
+        src/Coordinate.cpp
+        src/Clock.h
+        src/Odometry.cpp
+        src/SerialCodeurManager.cpp)
 
 # Linking wiringPi to the binary
 target_link_libraries(krabbs wiringPi)

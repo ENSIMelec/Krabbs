@@ -12,7 +12,12 @@ MotorManager::MotorManager(int i2c) {
 
 void MotorManager::setOrder(int leftOrder, int rightOrder) {
 
-    // We don't want values that are outside the range -255 to 255
+    // Don't send a message if the instructions are the same
+    if(leftOrder == lastLeftOrder && rightOrder == lastRightOrder) return;
+    lastLeftOrder = leftOrder;
+    lastRightOrder = rightOrder;
+
+    // We don't want values that are outside the range -MAX_SPEED to MAX_SPEED
     capPWM(&leftOrder);
     capPWM(&rightOrder);
 
@@ -26,19 +31,19 @@ void MotorManager::setOrder(int leftOrder, int rightOrder) {
     sendData();
 }
 
-void MotorManager::forward(int speed) { //Fait forward le robot
+void MotorManager::forward(int speed) {
     setOrder(speed, speed);
 	return;
 }
 
-void MotorManager::backward(int speed) { //Fait backward le robot
+void MotorManager::backward(int speed) {
     setOrder(-speed, -speed);
 	return;
 }
 
 void MotorManager::capPWM(int *PWM) {
-	if(*PWM < -255)	*PWM = -255;
-	else if(*PWM > 255) *PWM = 255;
+	if(*PWM < -MAX_SPEED) *PWM = -MAX_SPEED;
+	else if(*PWM > MAX_SPEED) *PWM = MAX_SPEED;
 }
 
 void MotorManager::stop()
@@ -104,4 +109,3 @@ MotorState MotorManager::getStateFromSign(int order) {
 
     return status;
 }
-

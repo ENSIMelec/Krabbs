@@ -6,6 +6,11 @@
 #include <iostream>
 #include <unistd.h>
 
+/* The max speed must be between 0 and 255
+ * Be careful when using values over 100
+ */
+ #define MAX_SPEED 100
+
 /**
  * The Arduino will receive 4 unsigned 8 bit integer values from the i2c bus.
  * The first two values are for the speed (PWM). The last two are for the direction of the motors.
@@ -30,6 +35,9 @@ private:
     // Speed values are between 0 and 255, they should not be over 100 for the safety of the robot
     uint8_t leftSpeed{};
     uint8_t rightSpeed{};
+
+    // Values are outside the range
+    int lastLeftOrder = 300, lastRightOrder = 300;
 
     MotorState leftMotorState;
     MotorState rightMotorState;
