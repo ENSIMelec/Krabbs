@@ -9,6 +9,8 @@
 #include "Utils.h"
 #include "Clock.h"
 #include "Odometry.h"
+#include "Point.h"
+#include "MotionController.h"
 
 using namespace std;
 
@@ -55,13 +57,17 @@ int main(int argc, char **argv) {
     SerialCodeurManager serialCodeurManager;
     Odometry odometry(serialCodeurManager, config);
 
-    // This is the main game loop
+    Point startingPosition(0, 0, 0);
+    Point endPosition(0, 100, 0);
+
+    MotionController motionController();
+
+    // This is the main game loop (it last 3 seconds)
     while(totalTime.elapsed_s() < 3) {
 
         // Check the position at a fixed interval
         if(timeSincePositionCheck.elapsed_ms() > 5) {
 
-            cout << "[" << totalTime.elapsed_ms() << "]" << endl;
             odometry.update();
             // Display time and position
             cout << "[" << totalTime.elapsed_ms() << "] " << odometry.getPositionStr() << endl;
