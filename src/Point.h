@@ -5,6 +5,9 @@
 #ifndef KRABBS_POINT_H
 #define KRABBS_POINT_H
 
+#include <string>
+using namespace std;
+
 class Point {
 
 private:
@@ -21,6 +24,7 @@ public:
     double getY() { return y; }
     double getAngle() { return angle; }
 
+    string to_string();
 };
 
 #endif //KRABBS_POINT_H
