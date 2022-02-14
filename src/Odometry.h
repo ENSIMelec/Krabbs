@@ -41,6 +41,9 @@ public:
     void init();
 
     std::string getPositionStr();
+
+    double getX();
+    double getY();
 };
 
 

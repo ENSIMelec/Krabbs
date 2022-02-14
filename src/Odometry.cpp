@@ -88,3 +88,11 @@ string Odometry::getPositionStr() {
 
 }
 
+double Odometry::getX() {
+    return x;
+}
+
+double Odometry::getY() {
+    return y;
+}
+
