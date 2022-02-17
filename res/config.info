@@ -44,9 +44,9 @@ asservissement {
 	;pid_kia 0
 	;pid_kda 5
 
-	pid_kpa 22
+	pid_kpa 3
 	pid_kia 0
-	pid_kda 5
+	pid_kda 0.5
 	
 	;pid d'angle en déplacement
 
