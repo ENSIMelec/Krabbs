@@ -10,7 +10,7 @@
 #include "Clock.h"
 #include "Odometry.h"
 #include "Point.h"
-#include "MotionController.h"
+#include "SerialCodeurManager.h"
 
 using namespace std;
 
@@ -27,6 +27,8 @@ int main(int argc, char **argv) {
     cout << "Loading the configuration ... ";
     Config config;
     config.loadFromFile(RES_PATH + "config.info");
+
+    unsigned int deltaAsservTimer = config.getDeltaAsserv();
 
     // TODO : add this constant to the config.info
     int I2C_MOTORS = 8;
@@ -52,50 +54,35 @@ int main(int argc, char **argv) {
     cout << "Start is done !" << endl;
 
     timer totalTime;
-    timer timeSincePositionCheck;
 
     SerialCodeurManager serialCodeurManager;
-    Odometry odometry(&serialCodeurManager, config);
+    Odometry odometry(serialCodeurManager);
+    Controller controller(serialCodeurManager, motorManager, config);
 
-    Point startingPosition(0, 0, 0);
-    Point endPosition(0, 100, 0);
+    timer asservTimer;
+    controller.setPosition(0, 0, 0);
+    controller.set_trajectory(Controller::XY_ABSOLU);
+    controller.set_point(300, 0, 0);
 
-    cout << "Odometry : ref = " << to_string((int) &odometry) << endl;
+    bool strategyIsDone = false;
+    while(!strategyIsDone && totalTime.elapsed_s() < 4) {
+        if(asservTimer.elapsed_ms() >= deltaAsservTimer) {
+            controller.update();
 
-    MotionController motionController(&motorManager, &odometry);
-    motionController.setDestination(endPosition);
-    motionController.calculateOrders(startingPosition, endPosition);
+            asservTimer.restart();
 
-    motorManager.setOrder(20, 20);
-    Utils::sleepMillis(1000);
-    motorManager.stop();
-
-    // This is the main game loop (it last 3 seconds)
-    while(totalTime.elapsed_s() < 3) {
-
-        // Check the position at a fixed interval
-        if(timeSincePositionCheck.elapsed_ms() > 5) {
-
-            // Update the position
-            odometry.update();
-
-            // Display time and position
-            cout << odometry.getPosition().to_string() << endl;
-
-//            motionController.controlMotors();
-            motorManager.forward(40);
-
-            // Restart the timer
-            timeSincePositionCheck.restart();
+            if(controller.is_target_reached()) {
+                cout << "Target reached !" << endl;
+                motorManager.stop();
+                strategyIsDone = true;
+            }
         }
     }
 
+    Utils::sleepMillis(10);
+
     cout << "Stopping motors " << endl;
     motorManager.stop();
-
-//    motorManager.forward(50);
-//    Utils::sleepMillis(1000);
-//    motorManager.stop();
 
     cout << "-- Quitting the application :" << endl;
 	cout << "Free memory ... ";

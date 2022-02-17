@@ -13,10 +13,16 @@ add_executable(krabbs
         src/MotorManager.cpp
         src/TestMovement.cpp
         src/Utils.cpp
-        src/Coordinate.cpp
         src/Clock.h
-        src/Odometry.cpp
-        src/SerialCodeurManager.cpp src/Point.cpp src/Point.h src/MotionController.cpp src/MotionController.h src/PID.cpp src/PID.h)
+        src/Configuration.cpp src/Configuration.h
+        src/Odometry.cpp src/Odometry.h
+        src/SerialCodeurManager.cpp src/SerialCodeurManager.h
+        src/Point.cpp src/Point.h
+        src/Controller.cpp src/Controller.h
+        src/PID.cpp src/PID.h
+        src/QuadrampDerivate.cpp src/QuadrampDerivate.h
+        src/MathUtils.cpp src/MathUtils.h
+        )
 
 # Linking wiringPi to the binary
 target_link_libraries(krabbs wiringPi)
