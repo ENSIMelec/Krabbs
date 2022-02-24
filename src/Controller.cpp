@@ -17,6 +17,7 @@
 #include "Controller.h"
 
 using namespace std;
+using namespace Trajectory;
 
 Controller::Controller(SerialCodeurManager& codeurs, MotorManager& motor, Config& config):
         m_odometry(codeurs), m_motor(motor), m_config(config)
@@ -69,17 +70,17 @@ void Controller::update()
 
     switch (m_trajectory) {
 
-        case THETA:
+        case Type::THETA:
             trajectory_theta(m_targetPos.theta);
             break;
-        case XY_ABSOLU:
+        case Type::XY_ABSOLU:
             trajectory_xy(m_targetPos.x, m_targetPos.y);
             break;
-        case LOCKED:
+        case Type::LOCKED:
             trajectory_stop();
             break;
 
-        case NOTHING:
+        case Type::NOTHING:
             //il n'y a plus rien a faire
             break;
 
@@ -89,18 +90,8 @@ void Controller::update()
     cout << "[CONSIGNE] TARGET DISTANCE (mm) : " << m_consign.distance << endl;
     cout << "[CONSIGNE] DIRECTION: " << m_direction << endl;
 
-
     // envoye des consignes au PID
     update_speed(m_consign.distance, m_consign.angle);
-
-    // gestion d'arrivé
-    // Pour l'instant gérée dans le main
-//    if(is_target_reached()) {
-//        trajectory_stop();
-//        motors_stop();
-//        cout << " ----- REACHED target" << endl;
-//    }
-
 }
 
 /**
@@ -131,23 +122,24 @@ void Controller::trajectory_xy(float x_voulu, float y_voulu) {
     // Direction (cap inférieur à -pi/2 et supérieur à pi/2)
     //gestion de la marche arrière si on dépasse point de consigne
     // TODO: à tester ( cas < -90  pas nécessaire)
-    if (m_consign.angle > M_PI_2)
-    {
-        m_direction = Direction::BACKWARD;
-        m_consign.angle -= M_PI;
-        m_consign.distance = -m_consign.distance;
-    }
-    else if (m_consign.angle < -M_PI_2)
-    {
-        m_direction = Direction::BACKWARD;
-        m_consign.angle += M_PI;
-        m_consign.distance = -m_consign.distance;
-    }
-    else {
-        m_direction = Direction::FORWARD;
-    }
-    // Borner l'angle [-pi, pi]
-    m_consign.angle = MathUtils::inrange(m_consign.angle, -M_PI, M_PI);
+//    if (m_consign.angle > M_PI_2)
+//    {
+//        m_direction = Direction::BACKWARD;
+//        m_consign.angle -= M_PI;
+//        m_consign.distance = -m_consign.distance;
+//    }
+//    else if (m_consign.angle < -M_PI_2)
+//    {
+//        m_direction = Direction::BACKWARD;
+//        m_consign.angle += M_PI;
+//        m_consign.distance = -m_consign.distance;
+//    }
+//    else {
+//        m_direction = Direction::FORWARD;
+//    }
+//
+//    // Borner l'angle [-pi, pi]
+//    m_consign.angle = MathUtils::inrange(m_consign.angle, -M_PI, M_PI);
 
     cout << "[CONSIGNE] X_DIFF = " << x_diff << " | Y_DIFF = " << y_diff  << endl;
 }
@@ -189,34 +181,41 @@ void Controller::update_speed(float consigne_distance, float consigne_theta) {
 
     // un mouvement en distance
     // PID distance activé
-    if(m_controlDistance) {
-        m_speedDistance = m_distancePID.compute(m_odometry.getTotalDistance(), ramped_consign_distance);
-//        m_speedDistance = m_distancePID.compute(m_odometry.getDeltaDistance(), consigne_distance);
-    }
+    m_speedDistance = m_distancePID.compute(m_odometry.getTotalDistance(), ramped_consign_distance);
+    //        m_speedDistance = m_distancePID.compute(m_odometry.getDeltaDistance(), consigne_distance);
 
     // un mouvement de rotation
-    // PID angle activé
-    if(m_controlAngle) {
-        // PID
-        double theta = m_odometry.getPosition().theta;
+    // PID
+    double theta = m_odometry.getPosition().theta;
 
 //        double erreurAngle = MathUtils::rad2deg(m_targetPos.theta - theta);
 //        double deltaErreurAngle = erreurAngle - m_preErreurAngle;
 //        m_preErreurAngle = erreurAngle;
 
-        cout << "[PID ANGLE] Consigne Theta : " << MathUtils::rad2deg(m_targetPos.theta) << endl;
-        cout << "[PID ANGLE] Theta : " << MathUtils::rad2deg(theta) << endl;
-        cout << "[PID ANGLE] Erreur : " << m_anglePID.getError() << endl;
-        cout << "[PID ANGLE] Delta erreur : " << m_anglePID.getDeltaError() << endl;
+//    cout << "[PID ANGLE] Consigne Theta : " << MathUtils::rad2deg(m_targetPos.theta) << endl;
+//    cout << "[PID ANGLE] Theta : " << MathUtils::rad2deg(theta) << endl;
+//    cout << "[PID ANGLE] Erreur : " << m_anglePID.getError() << endl;
+//    cout << "[PID ANGLE] Delta erreur : " << m_anglePID.getDeltaError() << endl;
 
-        m_speedAngle = m_anglePID.compute(MathUtils::rad2deg(m_odometry.getPosition().theta), MathUtils::rad2deg(m_targetPos.theta));
+    m_speedAngle = m_anglePID.compute(MathUtils::rad2deg(theta), MathUtils::rad2deg(m_consign.angle));
+    //m_speedAngle = m_anglePID.compute(m_odometry.getDeltaTheta(), consigne_theta);
 
-        //m_speedAngle = m_anglePID.compute(m_odometry.getDeltaTheta(), consigne_theta);
-        // Borner (pas nécessaire, la vitesse est déjà borner dans le PID)
-    }
+    double coeff_angle = 2;
+    m_speedAngle *= coeff_angle;
 
-    int leftPWM = m_speedDistance + m_speedAngle;
-    int rightPWM = m_speedDistance - m_speedAngle;
+    m_speedDistance = min(m_speedDistance, 80);
+
+    double deltaPWM = angleToCmd(MathUtils::rad2deg(m_consign.angle), 1.f);
+    double coefPWM = distanceToMultiplier(m_consign.distance, 0.2, 1.f);
+    int leftPWM = (50 - 100*(deltaPWM)) * coefPWM;
+    int rightPWM = (50 + 100*(deltaPWM)) * coefPWM;
+
+
+
+    // Cap the values
+//    double coeff = (double) max(leftPWM, rightPWM) / (double) MotorManager::getMaxAllowedSpeed();
+//    leftPWM /= coeff;
+//    rightPWM /= coeff;
 
     m_motor.setOrder(leftPWM, rightPWM);
 
@@ -242,7 +241,7 @@ void Controller::set_point(int x, int y, int angle) {
 /**
  * Stop des moteurs et réinitilisation des PID
  */
-void Controller::motors_stop() {
+void Controller::stop_motors() {
 
     // arrêt des moteurs
     m_motor.stop();
@@ -253,20 +252,19 @@ void Controller::motors_stop() {
 /** near the target (dist in mm and angle in rad) **/
 bool Controller::is_target_reached() {
 
-    int distance_tolerance = 8; //
-    double angle_tolerance = 0.05;
+    int distance_tolerance = 5; //
+    double angle_tolerance = MathUtils::deg2rad(1);
 
-    float angle_diff = MathUtils::rad2deg(m_targetPos.theta - m_odometry.getPosition().theta);
-//    cout << "[TARGET] Angle visé (°) : " << MathUtils::rad2deg(m_targetPos.theta) << "°" << endl;
-//    cout << "[TARGET] Angle actuel (°) : " << MathUtils::rad2deg(m_odometry.getPosition().theta) << "°" << endl;
-//    cout << "[TARGET] Diff visé-réel (°) : " << abs(angle_diff) << "°" << endl;
-    cout << "[TARGET] Distance visée (°) : " << m_consign.distance << "°" << endl;
-    cout << "[TARGET] Distance actuelle (°) : " << MathUtils::rad2deg(m_odometry.getPosition().theta) << "°" << endl;
-    cout << "[TARGET] Diff visée-réelle (°) : " << abs(angle_diff) << "°" << endl;
-
-
-    // get errors from PID
-    return abs(m_distancePID.getError()) < distance_tolerance && (abs(angle_diff) < angle_tolerance);
+    switch (m_trajectory) {
+        case Type::THETA:
+            return abs(m_targetPos.theta - m_odometry.getPosition().theta) < angle_tolerance;
+        case Type::XY_ABSOLU:
+            return m_consign.distance < distance_tolerance;
+        case Type::NOTHING:
+        case Type::LOCKED:
+        default:
+            return true;
+    }
 }
 
 /** return true if traj is nearly finished */
@@ -278,18 +276,18 @@ bool Controller::is_trajectory_reached() {
 
     switch (m_trajectory) {
 
-        case THETA:
+        case Type::THETA:
             reached = (abs(m_consign.angle) < angle_tolerance);
             //reached = m_rampfilterAngle.isRampFinished();
             break;
-        case XY_ABSOLU:
+        case Type::XY_ABSOLU:
             //reached = is_target_reached();
             reached = m_rampfilterDistance.isRampFinished();
             break;
-        case LOCKED:
+        case Type::LOCKED:
             reached = true;
             break;
-        case NOTHING:
+        case Type::NOTHING:
             reached = true;
             break;
         default:
@@ -298,3 +296,26 @@ bool Controller::is_trajectory_reached() {
 
     return reached;
 }
+
+double Controller::angleToCmd(double angle, double cmdMax) {
+    double ANGLE_MAX = 90;
+    double cmd = cmdMax * (angle/ANGLE_MAX);
+    return cmd;
+}
+
+double Controller::distanceToMultiplier(double distance, double cmdMin, double cmdMax){
+    double DISTANCE_MAX = 150;
+
+    if(distance >= DISTANCE_MAX)
+        return 1.f;
+
+    double cmd = (cmdMax - cmdMin) * (distance / DISTANCE_MAX) + cmdMin;
+    return cmd;
+}
+
+double Controller::angleToCmdLin(double angle, double d_min, double cmdMax) {
+    double ANGLE_MAX = 90;
+    double cmd = (100 - d_min) * (pow(ANGLE_MAX - angle, 2) / pow(ANGLE_MAX, 2)) + d_min;
+    return cmd / 100.0f * cmdMax * (angle < 0?-1:1);
+}
+

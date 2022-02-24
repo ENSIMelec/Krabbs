@@ -22,7 +22,7 @@ add_executable(krabbs
         src/PID.cpp src/PID.h
         src/QuadrampDerivate.cpp src/QuadrampDerivate.h
         src/MathUtils.cpp src/MathUtils.h
-        )
+        src/Strategy.cpp src/Strategy.h src/Trajectory.h)
 
 # Linking wiringPi to the binary
 target_link_libraries(krabbs wiringPi)

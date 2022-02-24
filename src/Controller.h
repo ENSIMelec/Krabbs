@@ -13,6 +13,8 @@
 #include "MathUtils.h"
 #include "Config.h"
 #include "QuadrampDerivate.h"
+#include "Trajectory.h"
+#include "Point.h"
 
 class Controller {
 
@@ -32,27 +34,24 @@ public:
         BACKWARD    = -1 ///< Le robot avance en marche arrière.
     };
 
-    enum Trajectory {
-        THETA,
-        XY_ABSOLU,
-        LOCKED,
-        NOTHING
-    };
-
     /**
      * Method asserv
      */
     void update();
     void set_point(int x, int y, int angle);
-    void set_trajectory(Trajectory trajectory) { m_trajectory = trajectory; }
-    void motors_stop();
+    void set_trajectory(Trajectory::Type trajectory) { m_trajectory = trajectory; }
+    void stop_motors();
     bool is_target_reached();
-    bool is_target_reached_xy();
-    bool is_target_reached_angle();
     bool is_trajectory_reached();
+
     void setPosition(float x, float y, float theta) { m_odometry.setPosition(x, y, theta); }
+
     Odometry& getOdometry() { return m_odometry; }
     int getm_direction() { return m_direction; }
+    double angleToCmd(double angle, double cmdMax);
+    double distanceToMultiplier(double distance, double cmdMin, double cmdMax);
+
+    double angleToCmdLin(double angle, double d_min, double cmdMax);
 
     //test
     bool isRampFinished() { return  m_rampfilterDistance.isRampFinished() && m_rampfilterAngle.isRampFinished(); }
@@ -64,10 +63,6 @@ private:
     void trajectory_theta(float angle_voulu);
     void trajectory_xy(float x_voulu, float y_voulu);
     void trajectory_stop();
-    void trajectory_distance_finished();
-    void trajectory_angle_finished();
-    void trajectory_distance_angle();
-    void set_consigne_distance_theta(float new_distance, float new_angle);
 
     // PID Controller
     PID m_leftSpeedPID;
@@ -79,7 +74,7 @@ private:
     Position m_targetPos;
 
     //Trajectory actuelle
-    Trajectory m_trajectory = NOTHING;
+    Trajectory::Type m_trajectory = Trajectory::Type::NOTHING;
 
     /**
      * Structure de la consigne à atteindre

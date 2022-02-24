@@ -10,7 +10,8 @@
 #include "Clock.h"
 #include "Odometry.h"
 #include "Point.h"
-#include "SerialCodeurManager.h"
+#include "Controller.h"
+#include "Strategy.h"
 
 using namespace std;
 
@@ -61,28 +62,34 @@ int main(int argc, char **argv) {
 
     timer asservTimer;
     controller.setPosition(0, 0, 0);
-    controller.set_trajectory(Controller::XY_ABSOLU);
-    controller.set_point(300, 0, 0);
+    controller.set_point(-500, 0, 0);
+    controller.set_trajectory(Trajectory::XY_ABSOLU);
+
+//    Strategy strategy(new Point(0, 0, 0, Trajectory::Type::XY_ABSOLU));
+//    strategy.addPoint(new Point(600, 0, 0, Trajectory::Type::XY_ABSOLU));
+//    strategy.initController(&controller);
+////    strategy.setNextPoint(&controller);
 
     bool strategyIsDone = false;
-    while(!strategyIsDone && totalTime.elapsed_s() < 4) {
+    while(!strategyIsDone && totalTime.elapsed_s() < 10) {
+
         if(asservTimer.elapsed_ms() >= deltaAsservTimer) {
             controller.update();
 
-            asservTimer.restart();
-
             if(controller.is_target_reached()) {
                 cout << "Target reached !" << endl;
-                motorManager.stop();
+                controller.stop_motors();
                 strategyIsDone = true;
+//                strategy.setNextPoint(&controller);
             }
+            asservTimer.restart();
         }
     }
 
-    Utils::sleepMillis(10);
+    Utils::sleepMillis(20);
 
     cout << "Stopping motors " << endl;
-    motorManager.stop();
+    controller.stop_motors();
 
     cout << "-- Quitting the application :" << endl;
 	cout << "Free memory ... ";

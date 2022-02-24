@@ -4,7 +4,7 @@
 
 #include "Point.h"
 
-Point::Point(float x, float y, float theta, Controller::Trajectory mTrajectory) :
+Point::Point(float x, float y, float theta, Trajectory::Type mTrajectory) :
     m_x(x),
     m_y(y),
     m_theta(theta),
@@ -16,7 +16,7 @@ Point::Point(float x, float y, float theta) :
     m_x(x),
     m_y(y),
     m_theta(theta),
-    m_trajectory(Controller::NOTHING) {
+    m_trajectory(Trajectory::Type::NOTHING) {
 
 }
 
@@ -32,7 +32,7 @@ float Point::getTheta() const {
     return m_theta;
 }
 
-Controller::Trajectory Point::getTrajectory() const {
+Trajectory::Type Point::getTrajectory() const {
     return m_trajectory;
 }
 
@@ -76,11 +76,15 @@ void Point::setMTimeout(int mTimeout) {
     m_timeout = mTimeout;
 }
 
-Controller::Trajectory Point::getMTrajectory() const {
+Trajectory::Type Point::getMTrajectory() const {
     return m_trajectory;
 }
 
-void Point::setMTrajectory(Controller::Trajectory mTrajectory) {
+void Point::setMTrajectory(Trajectory::Type mTrajectory) {
     m_trajectory = mTrajectory;
 }
 
+//std::ostream& Point::operator<<(std::ostream& os, const Point& obj) {
+//    os << "(X: " << m_x << ", Y: " << m_y << ", θ: " << m_theta << ")";
+//    return os;
+//}
