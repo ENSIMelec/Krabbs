@@ -55,23 +55,32 @@ int main(int argc, char **argv) {
     cout << "Start is done !" << endl;
 
     timer totalTime;
+    timer actionTime;
 
     SerialCodeurManager serialCodeurManager;
     Odometry odometry(serialCodeurManager);
     Controller controller(serialCodeurManager, motorManager, config);
 
     timer asservTimer;
-    controller.setPosition(0, 0, 0);
-    controller.set_point(-500, 0, 0);
-    controller.set_trajectory(Trajectory::XY_ABSOLU);
+//    controller.setPosition(0, 0, 0);
+//    controller.set_point(500, 500, 0);
+//    controller.set_trajectory(Trajectory::XY_ABSOLU);
 
-//    Strategy strategy(new Point(0, 0, 0, Trajectory::Type::XY_ABSOLU));
-//    strategy.addPoint(new Point(600, 0, 0, Trajectory::Type::XY_ABSOLU));
-//    strategy.initController(&controller);
-////    strategy.setNextPoint(&controller);
+    Strategy strategy(new Point(0, 0, 0, Trajectory::Type::XY_ABSOLU));
+    strategy.addPoint(new Point(500, 800, 0, Trajectory::Type::XY_ABSOLU));
+    strategy.addPoint(new Point(500, 0, 0, Trajectory::XY_ABSOLU));
+//    strategy.addPoint(new Point(1000, 300, 0, Trajectory::XY_ABSOLU));
+//    strategy.addPoint(new Point(-200, 0, 0, Trajectory::XY_ABSOLU));
+    strategy.addPoint(new Point(0, 0, 0, Trajectory::XY_ABSOLU));
+//    strategy.addPoint(new Point(, 1000, 0, Trajectory::XY_ABSOLU));
+    strategy.initController(&controller);
 
-    bool strategyIsDone = false;
-    while(!strategyIsDone && totalTime.elapsed_s() < 10) {
+    while(!strategy.isDone() && totalTime.elapsed_s() < 60) {
+
+        if(actionTime.elapsed_s() > 15) {
+            cout << "Something wrong append, going to next point ..." << endl;
+            strategy.setNextPoint(&controller);
+        }
 
         if(asservTimer.elapsed_ms() >= deltaAsservTimer) {
             controller.update();
@@ -79,8 +88,7 @@ int main(int argc, char **argv) {
             if(controller.is_target_reached()) {
                 cout << "Target reached !" << endl;
                 controller.stop_motors();
-                strategyIsDone = true;
-//                strategy.setNextPoint(&controller);
+                strategy.setNextPoint(&controller);
             }
             asservTimer.restart();
         }
