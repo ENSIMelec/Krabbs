@@ -6,6 +6,12 @@
 
 #include "Config.h"
 #include "MotorManager.h"
+#include "Utils.h"
+#include "Clock.h"
+#include "Odometry.h"
+#include "Point.h"
+#include "Controller.h"
+#include "Strategy.h"
 
 using namespace std;
 
@@ -22,6 +28,8 @@ int main(int argc, char **argv) {
     cout << "Loading the configuration ... ";
     Config config;
     config.loadFromFile(RES_PATH + "config.info");
+
+    unsigned int deltaAsservTimer = config.getDeltaAsserv();
 
     // TODO : add this constant to the config.info
     int I2C_MOTORS = 8;
@@ -45,6 +53,51 @@ int main(int argc, char **argv) {
     cout << "done" << endl;
 
     cout << "Start is done !" << endl;
+
+    timer totalTime;
+    timer actionTime;
+
+    SerialCodeurManager serialCodeurManager;
+    Odometry odometry(serialCodeurManager);
+    Controller controller(serialCodeurManager, motorManager, config);
+
+    timer asservTimer;
+//    controller.setPosition(0, 0, 0);
+//    controller.set_point(500, 500, 0);
+//    controller.set_trajectory(Trajectory::XY_ABSOLU);
+
+    Strategy strategy(new Point(0, 0, 0, Trajectory::Type::XY_ABSOLU));
+    strategy.addPoint(new Point(500, 800, 0, Trajectory::Type::XY_ABSOLU));
+    strategy.addPoint(new Point(500, 0, 0, Trajectory::XY_ABSOLU));
+//    strategy.addPoint(new Point(1000, 300, 0, Trajectory::XY_ABSOLU));
+//    strategy.addPoint(new Point(-200, 0, 0, Trajectory::XY_ABSOLU));
+    strategy.addPoint(new Point(0, 0, 0, Trajectory::XY_ABSOLU));
+//    strategy.addPoint(new Point(, 1000, 0, Trajectory::XY_ABSOLU));
+    strategy.initController(&controller);
+
+    while(!strategy.isDone() && totalTime.elapsed_s() < 60) {
+
+        if(actionTime.elapsed_s() > 15) {
+            cout << "Something wrong append, going to next point ..." << endl;
+            strategy.setNextPoint(&controller);
+        }
+
+        if(asservTimer.elapsed_ms() >= deltaAsservTimer) {
+            controller.update();
+
+            if(controller.is_target_reached()) {
+                cout << "Target reached !" << endl;
+                controller.stop_motors();
+                strategy.setNextPoint(&controller);
+            }
+            asservTimer.restart();
+        }
+    }
+
+    Utils::sleepMillis(20);
+
+    cout << "Stopping motors " << endl;
+    controller.stop_motors();
 
     cout << "-- Quitting the application :" << endl;
 	cout << "Free memory ... ";
