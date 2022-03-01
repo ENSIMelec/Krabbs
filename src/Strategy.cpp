@@ -5,10 +5,12 @@
 #include "Strategy.h"
 
 Strategy::Strategy(Point * startingPoint) {
-//    cout << "Starting position : " << startingPoint << endl;
-//    addPoint(startingPoint);
-//
-//    m_currentPoint = startingPoint;
+    cout << "Starting position : " << endl;
+    cout << "\tP (" << startingPoint->getX() << ", " << startingPoint->getY() << ", " << startingPoint->getTheta() << ")" << endl;
+
+    addPoint(startingPoint);
+
+    m_currentPoint = startingPoint;
 }
 
 Point * Strategy::getCurrentPoint() {
@@ -31,6 +33,8 @@ void Strategy::setNextPoint(Controller *controller) {
         return;
     }
 
+    m_currentPoint = m_points.operator[](m_currentPointIndex);
+
     cout << "Setting next point : (" << m_currentPoint->getX() << ", " << m_currentPoint->getY() << ", " <<
         m_currentPoint->getTheta() << ")" << endl;
 
@@ -40,11 +44,15 @@ void Strategy::setNextPoint(Controller *controller) {
 
 void Strategy::initController(Controller *controller) {
     cout << "==========================" << endl;
-    //cout << "Strategy points : " << endl;
+    cout << "Strategy points : " << endl;
     int i = 1;
     for(Point * point : m_points) {
-        cout << "\tP" << i++ << point << endl;
+        cout << "\tP" << i++ << " (" << point->getX() << ", " << point->getY() << ", " << point->getTheta() << ")" << endl;
     }
+
+    // Initialize the position
+    Point * firstPoint = m_points.operator[](0);
+    controller->setPosition(firstPoint->getX(), firstPoint->getY(), firstPoint->getTheta());
 
     setNextPoint(controller);
 }

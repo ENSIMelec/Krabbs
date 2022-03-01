@@ -172,7 +172,7 @@ void Controller::trajectory_stop() {
  */
 void Controller::update_speed(float consigne_distance, float consigne_theta) {
 
-    cout << "CONSIGNE_DISTANCE " << consigne_distance << " - | CONSIGNE THETA:  " << MathUtils::rad2deg(consigne_theta) << endl;
+//    cout << "CONSIGNE_DISTANCE " << consigne_distance << " - | CONSIGNE THETA:  " << MathUtils::rad2deg(consigne_theta) << endl;
 
 
     // On filtre la consigne à l'aide de la QuadrampDerivate pour savoir si l'on est en phase d'accélération, constante ou de décélération
@@ -220,12 +220,12 @@ void Controller::update_speed(float consigne_distance, float consigne_theta) {
     m_motor.setOrder(leftPWM, rightPWM);
 
     // debug:
-    cout << "[ERROR DISTANCE] Error distance : " << m_distancePID.getError() << endl;
-    cout << "[ERROR ANGLE] Error Angle : " << m_anglePID.getError() << endl;
-    cout << "[PID DISTANCE] Speed Translation : " << m_speedDistance << endl;
-    cout << "[PID ANGLE] Speed Rotation : " << m_speedAngle << endl;
-    cout << "[PWM] LEFT : " << leftPWM << " RIGHT: " << rightPWM << endl;
-    cout << " ======================== " << endl;
+//    cout << "[ERROR DISTANCE] Error distance : " << m_distancePID.getError() << endl;
+//    cout << "[ERROR ANGLE] Error Angle : " << m_anglePID.getError() << endl;
+//    cout << "[PID DISTANCE] Speed Translation : " << m_speedDistance << endl;
+//    cout << "[PID ANGLE] Speed Rotation : " << m_speedAngle << endl;
+//    cout << "[PWM] LEFT : " << leftPWM << " RIGHT: " << rightPWM << endl;
+//    cout << " ======================== " << endl;
 }
 /**
  * Mettre en place le point voulu à atteindre dans la table
