@@ -6,12 +6,14 @@ Please see the coding guidelines in the project repository before starting to co
 ## Project structure
 ```
 root
+├───arduino
 ├───docs
 ├───res
 ├───build
 └───src
 ```
 
+- arduino : contains the .ino files for the arduinos
 - docs : contains all the documentation for the project
 - res : contains all the resources needed for the project (ex: conf.info, fileactions etc)
 - build : contains the build files. Including the executable `krabbs`
