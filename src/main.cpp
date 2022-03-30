@@ -23,9 +23,9 @@ using namespace std;
 const string RES_PATH = "/home/pi/Documents/Krabbs/res/";
 
 int main(int argc, char **argv) {
-	cout << "-- Starting Krabbs :" << endl;
+//	cout << "-- Starting Krabbs :" << endl;
 
-    cout << "Loading the configuration ... ";
+//    cout << "Loading the configuration ... ";
     Config config;
     config.loadFromFile(RES_PATH + "config.info");
 
@@ -33,9 +33,9 @@ int main(int argc, char **argv) {
 
     // TODO : add this constant to the config.info
     int I2C_MOTORS = 8;
-    cout << "done" << endl;
+//    cout << "done" << endl;
 
-	cout << "Initializing the GPIO ... ";
+//	cout << "Initializing the GPIO ... ";
 	wiringPiSetupGpio();
     int i2cM = wiringPiI2CSetup(I2C_MOTORS);
 
@@ -46,49 +46,40 @@ int main(int argc, char **argv) {
     // If not initialized, the addresses are negative
     if(i2cS < 0 || i2cSt < 0 || i2cM < 0)
         return EXIT_FAIL_I2C;
-    cout << "done" << endl;
+//    cout << "done" << endl;
 
-    cout << "Initializing the motor manager ... ";
+//    cout << "Initializing the motor manager ... ";
 	MotorManager motorManager(i2cM);
-    cout << "done" << endl;
+//    cout << "done" << endl;
 
-    cout << "Start is done !" << endl;
+//    cout << "Start is done !" << endl;
 
     timer totalTime;
-    timer actionTime;
 
     SerialCodeurManager serialCodeurManager;
+
     Odometry odometry(serialCodeurManager);
-    Controller controller(serialCodeurManager, motorManager, config);
+    odometry.setPosition(0, 0, 0);
+
+    Controller controller(&odometry, &motorManager, &config);
+    controller.setTarget(-300, -300);
+
+    bool strategyIsDone = false;
 
     timer asservTimer;
-//    controller.setPosition(0, 0, 0);
-//    controller.set_point(500, 500, 0);
-//    controller.set_trajectory(Trajectory::XY_ABSOLU);
+    while(!strategyIsDone && totalTime.elapsed_s() < 4) {
 
-    Strategy strategy(new Point(0, 0, 0, Trajectory::Type::XY_ABSOLU));
-    strategy.addPoint(new Point(500, 800, 0, Trajectory::Type::XY_ABSOLU));
-    strategy.addPoint(new Point(500, 0, 0, Trajectory::XY_ABSOLU));
-//    strategy.addPoint(new Point(1000, 300, 0, Trajectory::XY_ABSOLU));
-//    strategy.addPoint(new Point(-200, 0, 0, Trajectory::XY_ABSOLU));
-    strategy.addPoint(new Point(0, 0, 0, Trajectory::XY_ABSOLU));
-//    strategy.addPoint(new Point(, 1000, 0, Trajectory::XY_ABSOLU));
-    strategy.initController(&controller);
-
-    while(!strategy.isDone() && totalTime.elapsed_s() < 60) {
-
-        if(actionTime.elapsed_s() > 15) {
-            cout << "Something wrong append, going to next point ..." << endl;
-            strategy.setNextPoint(&controller);
-        }
 
         if(asservTimer.elapsed_ms() >= deltaAsservTimer) {
+//            cout << totalTime.elapsed_us() << ";";
+
+            odometry.update();
             controller.update();
 
-            if(controller.is_target_reached()) {
+            if(controller.isTargetReached()) {
                 cout << "Target reached !" << endl;
-                controller.stop_motors();
-                strategy.setNextPoint(&controller);
+                controller.stopMotors();
+                strategyIsDone = true;
             }
             asservTimer.restart();
         }
@@ -96,16 +87,16 @@ int main(int argc, char **argv) {
 
     Utils::sleepMillis(20);
 
-    cout << "Stopping motors " << endl;
-    controller.stop_motors();
+//    cout << "Stopping motors " << endl;
+    controller.stopMotors();
 
-    cout << "-- Quitting the application :" << endl;
-	cout << "Free memory ... ";
+//    cout << "-- Quitting the application :" << endl;
+//	cout << "Free memory ... ";
     close(i2cM);
     close(i2cS);
     close(i2cSt);
-    cout << "done" << endl;
+//    cout << "done" << endl;
 
-	cout << "-- End of the program" << endl;
+//	cout << "-- End of the program" << endl;
 	return EXIT_SUCCESS;
 }

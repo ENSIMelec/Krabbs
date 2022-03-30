@@ -10,15 +10,23 @@ int encoders_fd ;
 
 SerialCodeurManager::SerialCodeurManager()
 {
-    cout << "Initializing coder manager ... ";
+//    cout << "Initializing coder manager ... ";
 
-    if ((encoders_fd = serialOpen ("/dev/ttyUSB0", 115200)) < 0) //A REMETTRE A 1 PLUS TARD
+    bool initSuccess = false;
+    for(int i=0 ; i <= 1; i++ ) {
+        string port = "/dev/ttyUSB" + to_string(i);
+        if((encoders_fd = serialOpen(port.c_str(), 115200)) > 0) {
+            initSuccess = true;
+            break;
+        };
+    }
+    if(!initSuccess) //A REMETTRE A 1 PLUS TARD
     {
         cout << "error :" << endl << "Unable to open serial device: %s\n" << strerror (errno) << endl;
         exit(3);
         //return 1 ;
     } else {
-        cout << "done" << endl;
+//        cout << "done" << endl;
     }
 
     nextTime = millis () + 10 ;
@@ -59,7 +67,7 @@ void SerialCodeurManager::readAndReset()
     while(serialDataAvail(encoders_fd)<=0 || (SerieData = serialGetchar(encoders_fd))!='?'){
         serialPutchar (encoders_fd, 'C');
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        //cout<<"Attente réception codeurs"<<endl;
+//        cout<<"Attente réception codeurs"<<endl;
     }
     //cout << "reception[";
     //SerieData = serialGetchar (fd);

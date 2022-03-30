@@ -18,6 +18,8 @@
 
 class Controller {
 
+#define DISTANCE_TRESHOLD 5
+
 public:
     /**
      * Initialisation de l'asservisement
@@ -25,104 +27,41 @@ public:
      * @param motor
      * @param config
     */
-    Controller(SerialCodeurManager& codeurs, MotorManager& motor, Config& config);
-    /** enum Direction
-    *  \brief Sens de déplacement pour le robot.
-    */
-    enum Direction {
-        FORWARD     = 1, ///< Le robot avance en marche avant.
-        BACKWARD    = -1 ///< Le robot avance en marche arrière.
-    };
+    Controller(Odometry * odometry_, MotorManager * motorManager_, Config * config_) {
+        this->odometry = odometry_;
+        this->motorManager = motorManager_;
+        this->config = config_;
+    }
 
-    /**
-     * Method asserv
-     */
     void update();
-    void set_point(int x, int y, int angle);
-    void set_trajectory(Trajectory::Type trajectory) { m_trajectory = trajectory; }
-    void stop_motors();
-    bool is_target_reached();
-    bool is_trajectory_reached();
-
-    void setPosition(float x, float y, float theta) { m_odometry.setPosition(x, y, theta); }
-
-    Odometry& getOdometry() { return m_odometry; }
-    int getm_direction() { return m_direction; }
-    double angleToCmd(double angle, double cmdMax);
-    double distanceToMultiplier(double distance, double cmdMin, double cmdMax);
-
-    double angleToCmdLin(double angle, double d_min, double cmdMax);
-
-    //test
-    bool isRampFinished() { return  m_rampfilterDistance.isRampFinished() && m_rampfilterAngle.isRampFinished(); }
-
-
+    void setTarget(int x, int y);
+    void stopMotors();
+    bool isTargetReached();
 private:
 
-    void update_speed(float consigne_distance, float consigne_theta);
-    void trajectory_theta(float angle_voulu);
-    void trajectory_xy(float x_voulu, float y_voulu);
-    void trajectory_stop();
-
-    // PID Controller
-    PID m_leftSpeedPID;
-    PID m_rightSpeedPID;
-    PID m_distancePID;
-    PID m_anglePID;
-
     // Target position
-    Position m_targetPos;
+    Position targetPosition;
 
-    //Trajectory actuelle
-    Trajectory::Type m_trajectory = Trajectory::Type::NOTHING;
-
-    /**
-     * Structure de la consigne à atteindre
-     */
-    struct
-    {
-        float distance = 0.0; // mm
-        float angle = 0.0; // rad
-
-    } m_consign;
-
-    /**
-     * Structure de la consigne initial à atteindre
-     */
-     struct {
-         float distance = 0.0; // mm
-         float angle = 0.0; // rad
-     } m_consignInitial;
-
-    int m_direction = 0;
-
-    float m_maxTranslationSpeed = 0; // mm/s
-    float m_maxRotationSpeed = 0; // mm/s
-    int m_maxPWM = 0;
-    int m_maxPWMR = 0;
+    double angleError;
 
     //Odometry
-    Odometry m_odometry;
+    Odometry * odometry;
 
     // MoteurManager
-    MotorManager m_motor;
+    MotorManager * motorManager;
+
     //Config
-    Config m_config;
+    Config * config;
 
-    // enabled cs system
-    bool m_controlDistance = true;
-    bool m_controlAngle = true;
+    double calculateAngleError();
+    double getDistanceToTarget();
 
-    // cs speed
-    int m_speedDistance = 0;
-    int m_speedAngle = 0;
+    void setConsign(double distance, double angle);
 
-    // Quadramp filter distance
-    QuadrampDerivate m_rampfilterDistance;
-    // Quadramp filter angle
-    QuadrampDerivate m_rampfilterAngle;
-
-    double m_preErreurAngle = 0;
+    struct {
+        double distance = 0;
+        double angle = 0;
+    } consign;
 };
 
 
