@@ -38,7 +38,7 @@ void Strategy::setNextPoint(Controller *controller) {
     cout << "Setting next point : (" << m_currentPoint->getX() << ", " << m_currentPoint->getY() << ", " <<
         m_currentPoint->getTheta() << ")" << endl;
 
-    controller->setTarget(m_currentPoint->getX(), m_currentPoint->getY());
+    controller->setTargetXY(m_currentPoint->getX(), m_currentPoint->getY());
 }
 
 void Strategy::initController(Controller *controller) {

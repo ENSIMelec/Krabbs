@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
     odometry.setPosition(0, 0, 0);
 
     Controller controller(&odometry, &motorManager, &config);
-    controller.setTarget(-300, -300);
+    controller.setTargetXY(-300, 0);
 
     bool strategyIsDone = false;
 

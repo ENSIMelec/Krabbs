@@ -5,51 +5,49 @@
 
 void Controller::update() {
 
-    double Pk_angle = 200;
-    double Pk_distance = 1;
-
-    // Move forward if the angle error is low
-    double distance = getDistanceToTarget() * Pk_distance;
+    double distance = calculateDistanceError() * Pk_distance;
     int distanceCommand = MathUtils::constrain(distance, 0, 100);
 
-    angleError = calculateAngleError();
+    double angleError = calculateAngleError();
     double angleCommand = angleError * Pk_angle;
 
     // Apply commands
     motorManager->setOrder(distanceCommand - angleCommand, distanceCommand + angleCommand);
+}
 
+void Controller::debug() {
 #ifdef CSV_PRINT
     cout << consign.angle << ";" << odometry->getTheta() << endl;
 #endif
 
 #ifdef DEBUG_CONTROLLER
     Position pos = odometry->getPosition();
+    double distanceError = calculateDistanceError();
+    double angleError = calculateAngleError();
+
     cout << "[POSITION] X: " << pos.x << "\tY: " << pos.y << "\tTheta: " << pos.theta << "(" << MathUtils::rad2deg(pos.theta) << "°)" << endl;
-    cout << "[CONTROLLER] Consigne distance : " << consign.distance << "\tConsigne angle : " << consign.angle << endl;
+    cout << "[CONTROLLER] Distance Error : " << distanceError << "\tAngle error : " << angleError << endl;
 
     cout << "[CONTROLLER] Angle error : " << angleError << endl;
-    cout << "[CONTROLLER] Angle command : " << angleCommand << "\tDistance command : " << distanceCommand << endl;
+    cout << "[CONTROLLER] Angle command : " << command.angle << "\tDistance command : " << command.distance << endl;
 #endif
 }
 
-void Controller::setConsign(double distance, double angle) {
-    consign.distance = distance;
-    consign.angle = angle;
+void Controller::absoluteAngle() {
+    double angleError = calculateAngleError();
+    command.angle = angleError * Pk_angle;
+    command.distance = 0;
+
+    currentTrajectoryType = ANGLE;
 }
 
-void Controller::setTarget(int x, int y) {
+void Controller::setTargetAngle(double angle) {
+    targetPosition.theta = angle;
+}
+
+void Controller::setTargetXY(int x, int y) {
     targetPosition.x = x;
     targetPosition.y = y;
-
-    Position pos = odometry->getPosition();
-    double dX = pos.x - x;
-    double dY = pos.y - y;
-    double distance = sqrt(dX * dX + dY * dY);
-
-    consign.distance = distance;
-    consign.angle = acos(dX / distance);
-
-    if(y < pos.y) consign.angle *= -1;
 }
 
 void Controller::stopMotors() {
@@ -59,7 +57,7 @@ void Controller::stopMotors() {
 bool Controller::isTargetReached() {
 
     // Get the distance between actual position and target
-    double distance = getDistanceToTarget();
+    double distance = calculateDistanceError();
     return distance < DISTANCE_TRESHOLD;
 }
 
@@ -87,8 +85,7 @@ double Controller::calculateAngleError() {
 /**
  * Get the distance between the current position and target
  */
-double Controller::getDistanceToTarget() {
-
+double Controller::calculateDistanceError() {
     Position currentPosition = odometry->getPosition();
 
     double dX = currentPosition.x - targetPosition.x;

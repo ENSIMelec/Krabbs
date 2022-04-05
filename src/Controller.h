@@ -13,7 +13,6 @@
 #include "MathUtils.h"
 #include "Config.h"
 #include "QuadrampDerivate.h"
-#include "Trajectory.h"
 #include "Point.h"
 
 class Controller {
@@ -34,15 +33,27 @@ public:
     }
 
     void update();
-    void setTarget(int x, int y);
+
+    void setTargetXY(int x, int y);
+    void setTargetAngle(double angle);
+
     void stopMotors();
     bool isTargetReached();
 private:
 
+    enum TrajectoryType {
+        XY,
+        ANGLE,
+        NONE
+    };
+    TrajectoryType currentTrajectoryType = NONE;
+
+    // Correctors
+    double Pk_angle = 200;
+    double Pk_distance = 1;
+
     // Target position
     Position targetPosition;
-
-    double angleError;
 
     //Odometry
     Odometry * odometry;
@@ -54,14 +65,15 @@ private:
     Config * config;
 
     double calculateAngleError();
-    double getDistanceToTarget();
-
-    void setConsign(double distance, double angle);
+    double calculateDistanceError();
 
     struct {
-        double distance = 0;
         double angle = 0;
-    } consign;
+        double distance = 0;
+    } command;
+
+    void absoluteAngle();
+    void debug();
 };
 
 
