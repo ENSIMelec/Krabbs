@@ -155,3 +155,7 @@ void Odometry::distance_total_update(int long ticksLeft, int long ticksRight) {
     m_totalDistance += m_dDistance;
     m_totalAngle += m_dTheta;
 }
+
+double Odometry::getTheta() {
+    return m_pos.theta;
+}

@@ -38,8 +38,7 @@ void Strategy::setNextPoint(Controller *controller) {
     cout << "Setting next point : (" << m_currentPoint->getX() << ", " << m_currentPoint->getY() << ", " <<
         m_currentPoint->getTheta() << ")" << endl;
 
-    controller->set_point(m_currentPoint->getX(), m_currentPoint->getY(), m_currentPoint->getTheta());
-    controller->set_trajectory(m_currentPoint->getTrajectory());
+    controller->setTargetXY(m_currentPoint->getX(), m_currentPoint->getY());
 }
 
 void Strategy::initController(Controller *controller) {
@@ -52,7 +51,6 @@ void Strategy::initController(Controller *controller) {
 
     // Initialize the position
     Point * firstPoint = m_points.operator[](0);
-    controller->setPosition(firstPoint->getX(), firstPoint->getY(), firstPoint->getTheta());
 
     setNextPoint(controller);
 }

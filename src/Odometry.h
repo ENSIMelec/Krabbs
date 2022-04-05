@@ -77,6 +77,8 @@ public:
     float getEntraxe() const { return ENTRAXE; };
 
 
+    double getTheta();
+
 protected:
     Position m_pos; /*!< Structure de position de Odometry. */
     float m_linVel = 0; /*!< Vitesse lineaire en mm/s. */
