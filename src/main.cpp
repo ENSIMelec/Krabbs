@@ -62,13 +62,12 @@ int main(int argc, char **argv) {
     odometry.setPosition(0, 0, 0);
 
     Controller controller(&odometry, &motorManager, &config);
-    controller.setTargetXY(-300, 0);
+    controller.setTargetXY(300, 300);
 
     bool strategyIsDone = false;
 
     timer asservTimer;
     while(!strategyIsDone && totalTime.elapsed_s() < 4) {
-
 
         if(asservTimer.elapsed_ms() >= deltaAsservTimer) {
 //            cout << totalTime.elapsed_us() << ";";
