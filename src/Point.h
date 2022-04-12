@@ -7,14 +7,12 @@
 
 using namespace std;
 
-#include "Trajectory.h"
 #include "Controller.h"
 
 class Point {
 
 public:
 
-    Point(float mX, float mY, float mTheta, Trajectory::Type mTrajectory);
     Point(float mX, float mY, float mTheta);
     float getX() const;
     float getY() const;
@@ -29,17 +27,8 @@ public:
     int getMSpeed() const;
     void setMSpeed(int mSpeed);
 
-    const string &getMAction() const;
-    void setMAction(const string &mAction);
-
     int getMTimeout() const;
     void setMTimeout(int mTimeout);
-
-    Trajectory::Type getMTrajectory() const;
-    void setMTrajectory(Trajectory::Type mTrajectory);
-
-    Trajectory::Type getTrajectory() const;
-
 //    std::ostream& operator<<(std::ostream& os, const Point& obj);
 private:
 
@@ -49,10 +38,7 @@ private:
     float m_distance_tolerance;
     float m_angle_tolerance;
     int m_speed;
-    string m_action;
     int m_timeout;
-    Trajectory::Type m_trajectory = Trajectory::THETA;
-
 };
 
 

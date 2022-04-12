@@ -12,6 +12,7 @@
 #include "Point.h"
 #include "Controller.h"
 #include "Strategy.h"
+#include "AX12Manager.h"
 
 using namespace std;
 
@@ -62,7 +63,13 @@ int main(int argc, char **argv) {
     odometry.setPosition(0, 0, 0);
 
     Controller controller(&odometry, &motorManager, &config);
-    controller.setTargetXY(300, 300);
+    //controller.setTargetXY(300, 300);
+
+    AX12Manager ax12Manager(1);
+    Utils::sleepMillis(1000);
+    cout << "Sending ax12 instructions." << endl;
+    ax12Manager.AX12Action(1, 512, 1023);
+    ax12Manager.close();
 
     bool strategyIsDone = false;
 

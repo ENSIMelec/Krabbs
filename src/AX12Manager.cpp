@@ -50,17 +50,17 @@ int AX12Manager::initialisation() {
 		return 1;
 	}
 	//Secondly, the controller sets the communication BAUDRATE at the port opened previously.
-/////////////////////////////////////////IL FAUT INIT TOUS LES AX12 /////////////////////////////////////////////////
+    /////////////////////////////////////////IL FAUT INIT TOUS LES AX12 /////////////////////////////////////////////////
 	for(index_ID = 1; index_ID <= nbAX12; index_ID++) {
 		// Enable DXL Torque
-		dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, index_ID, ADDR_MX_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
+		dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, index_ID, ADDR_AX_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
 		if (dxl_comm_result != COMM_SUCCESS)
 		{
 			//packetHandler->printTxRxResult(dxl_comm_result);
 			std::cout << "Erreur COMM init Dyna " << index_ID << std::endl;
 		}
 		else if (dxl_error != 0)
-		{
+        {
 			//packetHandler->printRxPacketError(dxl_error);
 			std::cout << "Erreur init Dyna " << index_ID << std::endl;
 		}
@@ -84,7 +84,7 @@ void AX12Manager::close() {
 	uint8_t dxl_error = 0;
 	for(int index_ID = 1; index_ID <= nbAX12; index_ID++) {
 		// Disable Dynamixel Torque
-		dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, index_ID, ADDR_MX_TORQUE_ENABLE, TORQUE_DISABLE, &dxl_error);
+		dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, index_ID, ADDR_AX_TORQUE_ENABLE, TORQUE_DISABLE, &dxl_error);
 		if (dxl_comm_result != COMM_SUCCESS)
 		{
 			//packetHandler->printTxRxResult(dxl_comm_result);
@@ -108,10 +108,10 @@ void AX12Manager::close() {
 }
 
 int AX12Manager::AX12Action(int numActionneur, int angleAction, int forceAction) {
-	timer temps;
+	//timer temps;
 
 	std::cout << "Numéro AX12 ID : " << numActionneur << std::endl;
-	int DXL_ID = numActionneur;
+	int dxl_id = numActionneur;
 	int dxl_goal_position = angleAction;
 
 	int dxl_comm_result = COMM_TX_FAIL;
@@ -133,7 +133,7 @@ int AX12Manager::AX12Action(int numActionneur, int angleAction, int forceAction)
 	}
 */
 	//limite le couple
-	dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, DXL_ID, ADDR_MX_TORQUE_LIMIT, forceAction, &dxl_error);
+	dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, DXL_ID, ADDR_AX_TORQUE_LIMIT, forceAction, &dxl_error);
 	if (dxl_comm_result != COMM_SUCCESS)
 	{
 		//packetHandler->printTxRxResult(dxl_comm_result);
@@ -145,9 +145,9 @@ int AX12Manager::AX12Action(int numActionneur, int angleAction, int forceAction)
 		std::cout << "Erreur limitation couple " << DXL_ID << std::endl;
 	}
 
-	temps.restart();
+	//temps.restart();
     // Write goal position
-	dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, DXL_ID, ADDR_MX_GOAL_POSITION, dxl_goal_position, &dxl_error);
+	dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, DXL_ID, ADDR_AX_GOAL_POSITION, dxl_goal_position, &dxl_error);
     if (dxl_comm_result != COMM_SUCCESS)
     {
       	//packetHandler->printTxRxResult(dxl_comm_result);
@@ -192,5 +192,5 @@ int AX12Manager::AX12Action(int numActionneur, int angleAction, int forceAction)
 
 	At last, it changes its direction to the counter-wise and waits for extra key input.
 	*/
-	return temps.elapsed_ms();
+	return 0; //temps.elapsed_ms();
 }

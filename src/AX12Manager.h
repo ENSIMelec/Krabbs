@@ -6,34 +6,35 @@
 #include <stdlib.h> //The function abs() is in the example code, and it needs stdlib.h to be included.
 #include <stdio.h> //The example shows Dynamixel status in sequence by the function printf(). So here stdio.h is needed.
 
-#include "dynamixel_sdk/dynamixel_sdk.h"                                  // Uses Dynamixel SDK library
-//All libraries of Dynamixel SDK are linked with the header file dynamixel_sdk.h.
-#include "Clock.h"
+
+#include <dynamixel_sdk/dynamixel_sdk.h>
+using namespace dynamixel;
+
+#include "dynamixel_sdk/port_handler_linux.h"
+#include "dynamixel_sdk/protocol1_packet_handler.h"
 
 // Control table address
-#define ADDR_MX_TORQUE_ENABLE           24                  // Control table address is different in Dynamixel model
-#define ADDR_MX_GOAL_POSITION           30
-#define ADDR_MX_PRESENT_POSITION        36
-#define ADDR_MX_PRESENT_VOLTAGE        	42
-#define ADDR_MX_SPEED_VALUE             32
-#define ADDR_MX_TORQUE_LIMIT            34
-#define ADDR_MX_PRESENT_LOAD            40
+#define ADDR_AX_BAUD_RATE                  4
+#define ADDR_AX_TORQUE_ENABLE           24                  // Control table address is different in Dynamixel model
+#define ADDR_AX_GOAL_POSITION           30
+#define ADDR_AX_PRESENT_POSITION        36
+#define ADDR_AX_PRESENT_VOLTAGE         42
+#define ADDR_AX_SPEED_VALUE             32
+#define ADDR_AX_TORQUE_LIMIT            34
+#define ADDR_AX_PRESENT_LOAD            40
+
+#define READ_DATA   0x02
+#define HEADER      0xFF
 //Dynamixel series have their own control tables: Addresses and Byte Length in each items. To control one of the items, its address (and length if necessary) is required. Find your requirements in http://support.robotis.com/.
 
 // Protocol version
 #define PROTOCOL_VERSION                1.0                 // See which protocol version is used in the Dynamixel
-
 // Default setting
 #define BAUDRATE                        1000000
 #define DEVICENAME                      "/dev/ttyACM0"      // Check which port is being used on your controller
-                                                            // ex) Windows: "COM1"   Linux: "/dev/ttyUSB0"
-
-#define TORQUE_ENABLE                   1                   // Value for enabling the torque
-#define TORQUE_DISABLE                  0                   // Value for disabling the torque
-#define DXL_MINIMUM_POSITION_VALUE      300                 // Dynamixel will rotate between this value
-#define DXL_MAXIMUM_POSITION_VALUE      900                // and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
-#define DXL_MOVING_STATUS_THRESHOLD     30                  // Dynamixel moving status threshold
-
+#define DXL_ID 4
+#define TORQUE_ENABLE 1
+#define TORQUE_DISABLE 0
 
 /*
 COMM_TX_FAIL
