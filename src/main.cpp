@@ -13,6 +13,8 @@
 #include "Controller.h"
 #include "Strategy.h"
 #include "AX12Manager.h"
+#include "ActionManager.h"
+#include "ServoManager.h"
 
 using namespace std;
 
@@ -65,11 +67,8 @@ int main(int argc, char **argv) {
     Controller controller(&odometry, &motorManager, &config);
     //controller.setTargetXY(300, 300);
 
-    AX12Manager ax12Manager(1);
-    Utils::sleepMillis(1000);
-    cout << "Sending ax12 instructions." << endl;
-    ax12Manager.AX12Action(1, 512, 1023);
-    ax12Manager.close();
+    ActionManager actionManager(i2cS, 1);
+    actionManager.action(RES_PATH + "actions/simpleAX12Test.as");
 
     bool strategyIsDone = false;
 
@@ -98,6 +97,7 @@ int main(int argc, char **argv) {
 
 //    cout << "-- Quitting the application :" << endl;
 //	cout << "Free memory ... ";
+    actionManager.close();
     close(i2cM);
     close(i2cS);
     close(i2cSt);

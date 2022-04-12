@@ -66,7 +66,7 @@ protected :
 	 *  Méthode qui permet de convertir un angle en tick conformément à ce que veut la libraire pca9685.h.
 	 *  
 	 *  \param angle : angle en degrée [0-180].
-	 *  \return le nombre de ticks à écrire dans le registre du shield servos
+	 *  \return le nombre de ticks à écrire dans le registre du shield servoManager
 	 */
 	int angleToTicks(int angle);
 
@@ -76,7 +76,7 @@ protected :
 	 *  Méthode qui permet de convertir un nombre de ticks en angle.
 	 *  
 	 *  \param ticks : nombre de ticks [0-4095] (12bits).
-	 *  \return le nombre de ticks à écrire dans le registre du shield servos
+	 *  \return le nombre de ticks à écrire dans le registre du shield servoManager
 	 */
 	int ticksToAngle(int ticks);
 };

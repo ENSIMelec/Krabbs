@@ -4,9 +4,9 @@ using namespace std;
 
 //Constructeur par défaut : utilise la liste d'initialisation pour init les classes utilisées dans la classe
 ActionManager::ActionManager(int i2c_Servos, int nbAX12) :
-	servos(i2c_Servos), AX12(nbAX12)
+        servoManager(i2c_Servos), ax12Manager(nbAX12)
 {
-	servos.servoInitialisation();
+	servoManager.servoInitialisation();
 	printf("Constructeur action");
 }
 
@@ -14,16 +14,16 @@ ActionManager::ActionManager(int i2c_Servos, int nbAX12) :
 void ActionManager::close() {
 	cout << "Arrêt du lanceur" << endl;
 	sleepMillis(250);
-	AX12.close();
+	ax12Manager.close();
 	return;
 }
 
 
-void ActionManager::action(string filname) {
+void ActionManager::action(string filename) {
 	
 	unsigned int indexAction = 0;
 	vector<ActionServo> actions;
-	actions = FichierAction::readPoints(filname);
+	actions = FichierAction::readPoints(filename);
 	char typeActionneur;
 	int numActionneur, angleAction, forceAction, tempsAction;
 
@@ -37,7 +37,7 @@ void ActionManager::action(string filname) {
 
 		switch(typeActionneur) {
 			case 'S':
-				servos.servoAction(numActionneur, angleAction);
+				servoManager.servoAction(numActionneur, angleAction);
 				//client.sendMessage("I Servo n°"+to_string(numActionneur)+" angle : "+to_string(angleAction));
 				break;
 			case 'N':
@@ -52,8 +52,8 @@ void ActionManager::action(string filname) {
 				//client.addPoints(numActionneur, angleAction);
 				break;
 			case 'A':
-				tempsAction -= AX12.AX12Action(numActionneur, angleAction, forceAction); //On effectue l'action AX12, on met à jour le temps qu'il reste avant la fin de l'action
-				//client.sendMessage("I AX12 n°"+to_string(numActionneur)+" angle : "+to_string(angleAction)+" force : "+to_string(forceAction));
+				tempsAction -= ax12Manager.AX12Action(numActionneur, angleAction, forceAction); //On effectue l'action ax12Manager, on met à jour le temps qu'il reste avant la fin de l'action
+				//client.sendMessage("I ax12Manager n°"+to_string(numActionneur)+" angle : "+to_string(angleAction)+" force : "+to_string(forceAction));
 				break;//Attention aux delays
 			default: //On ne lance pas d'action, mais on attend le temps demandé
 				break;

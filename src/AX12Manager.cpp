@@ -1,4 +1,5 @@
 #include "AX12Manager.h"
+#include "Clock.h"
 
 AX12Manager::AX12Manager(int nbAX) : nbAX12(nbAX) {
 	initialisation();
@@ -50,7 +51,7 @@ int AX12Manager::initialisation() {
 		return 1;
 	}
 	//Secondly, the controller sets the communication BAUDRATE at the port opened previously.
-    /////////////////////////////////////////IL FAUT INIT TOUS LES AX12 /////////////////////////////////////////////////
+    /////////////////////////////////////////IL FAUT INIT TOUS LES ax12Manager /////////////////////////////////////////////////
 	for(index_ID = 1; index_ID <= nbAX12; index_ID++) {
 		// Enable DXL Torque
 		dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, index_ID, ADDR_AX_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
@@ -103,14 +104,14 @@ void AX12Manager::close() {
 		Then, it receives the dxl_error. The function returns 0 if no communication error has been occurred.
 		*/
 	}
-	std::cout << "Close port AX12" << std::endl;
+	std::cout << "Close port ax12Manager" << std::endl;
 	portHandler->closePort();
 }
 
 int AX12Manager::AX12Action(int numActionneur, int angleAction, int forceAction) {
-	//timer temps;
+	timer temps;
 
-	std::cout << "Numéro AX12 ID : " << numActionneur << std::endl;
+	std::cout << "Numéro ax12Manager ID : " << numActionneur << std::endl;
 	int dxl_id = numActionneur;
 	int dxl_goal_position = angleAction;
 
@@ -145,7 +146,7 @@ int AX12Manager::AX12Action(int numActionneur, int angleAction, int forceAction)
 		std::cout << "Erreur limitation couple " << DXL_ID << std::endl;
 	}
 
-	//temps.restart();
+	temps.restart();
     // Write goal position
 	dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, DXL_ID, ADDR_AX_GOAL_POSITION, dxl_goal_position, &dxl_error);
     if (dxl_comm_result != COMM_SUCCESS)
@@ -192,5 +193,5 @@ int AX12Manager::AX12Action(int numActionneur, int angleAction, int forceAction)
 
 	At last, it changes its direction to the counter-wise and waits for extra key input.
 	*/
-	return 0; //temps.elapsed_ms();
+	return temps.elapsed_ms();
 }

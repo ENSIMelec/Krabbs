@@ -53,7 +53,7 @@ int baseReg(int pin);
  *  
  * pinBase: 	Use a pinBase > 64, eg. 300
  * i2cAddress:	The default address is 0x40
- * freq:		Frequency will be capped to range [40..1000] Hertz. Try 50 for servos
+ * freq:		Frequency will be capped to range [40..1000] Hertz. Try 50 for servoManager
  */
 int pca9685Setup(const int pinBase, int fd, float freq)
 {
@@ -86,7 +86,7 @@ int pca9685Setup(const int pinBase, int fd, float freq)
 
 /**
  * Sets the frequency of PWM signals.
- * Frequency will be capped to range [40..1000] Hertz. Try 50 for servos.
+ * Frequency will be capped to range [40..1000] Hertz. Try 50 for servoManager.
  */
 void pca9685PWMFreq(int fd, float freq)
 {

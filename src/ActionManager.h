@@ -25,9 +25,9 @@ public:
 private:
 	void sleepMillis(int millis);
 	//ClientUDP &client;
-	ServoManager servos;
+	ServoManager servoManager;
 	//StepperManager stepper;
-	AX12Manager AX12;
+	AX12Manager ax12Manager;
 };
 
 #endif // ACTIONMANAGER_H_INCLUDED
