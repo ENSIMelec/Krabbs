@@ -4,19 +4,10 @@
 
 #include "Point.h"
 
-Point::Point(float x, float y, float theta, Trajectory::Type mTrajectory) :
-    m_x(x),
-    m_y(y),
-    m_theta(theta),
-    m_trajectory(mTrajectory) {
-
-}
-
 Point::Point(float x, float y, float theta) :
     m_x(x),
     m_y(y),
-    m_theta(theta),
-    m_trajectory(Trajectory::Type::NOTHING) {
+    m_theta(theta) {
 
 }
 
@@ -30,10 +21,6 @@ float Point::getY() const {
 
 float Point::getTheta() const {
     return m_theta;
-}
-
-Trajectory::Type Point::getTrajectory() const {
-    return m_trajectory;
 }
 
 float Point::getMDistanceTolerance() const {
@@ -60,13 +47,6 @@ void Point::setMSpeed(int mSpeed) {
     m_speed = mSpeed;
 }
 
-const string &Point::getMAction() const {
-    return m_action;
-}
-
-void Point::setMAction(const string &mAction) {
-    m_action = mAction;
-}
 
 int Point::getMTimeout() const {
     return m_timeout;
@@ -75,16 +55,3 @@ int Point::getMTimeout() const {
 void Point::setMTimeout(int mTimeout) {
     m_timeout = mTimeout;
 }
-
-Trajectory::Type Point::getMTrajectory() const {
-    return m_trajectory;
-}
-
-void Point::setMTrajectory(Trajectory::Type mTrajectory) {
-    m_trajectory = mTrajectory;
-}
-
-//std::ostream& Point::operator<<(std::ostream& os, const Point& obj) {
-//    os << "(X: " << m_x << ", Y: " << m_y << ", θ: " << m_theta << ")";
-//    return os;
-//}

@@ -121,7 +121,7 @@ void Config::printConfig() const {
 	cout << "Ip serveur : " << getIpServer() << endl;
 	cout << "Port serveur : " << getPort() << endl;
 	cout << "Temps minimum entre deux appels d'asservissement : " << getDeltaAsserv() << endl << endl;
-	cout << "Nombre d'AX12 à connecter : " << getNbAX12() << endl;
+	cout << "Nombre d'ax12Manager à connecter : " << getNbAX12() << endl;
 
 	cout << "Coefficients : " << endl;
 	cout << "-Longueur :" << endl << "\tGauche : " << getCoeffGLong() << endl << "\tDroite : " << getCoeffDLong() << endl;
