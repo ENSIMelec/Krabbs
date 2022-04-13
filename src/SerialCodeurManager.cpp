@@ -22,7 +22,7 @@ SerialCodeurManager::SerialCodeurManager()
     }
     if(!initSuccess) //A REMETTRE A 1 PLUS TARD
     {
-        cout << "error :" << endl << "Unable to open serial device: " << strerror (errno) << endl;
+        cout << "Serial Coder Manager Error :" << endl << "Unable to open serial device. " << strerror (errno) << endl;
         exit(3);
         //return 1 ;
     } else {
