@@ -4,17 +4,14 @@
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 
-#include "Config.h"
-#include "MotorManager.h"
-#include "Utils.h"
-#include "Clock.h"
-#include "Odometry.h"
-#include "Point.h"
-#include "Controller.h"
-#include "Strategy.h"
-#include "AX12Manager.h"
-#include "ActionManager.h"
-#include "ServoManager.h"
+#include "base/Config.h"
+#include "base/MotorManager.h"
+#include "base/Utils.h"
+#include "base/Clock.h"
+#include "base/Odometry.h"
+#include "base/Point.h"
+#include "base/Controller.h"
+#include "base/ActionManager.h"
 
 using namespace std;
 
@@ -62,18 +59,18 @@ int main(int argc, char **argv) {
     SerialCodeurManager serialCodeurManager;
 
     Odometry odometry(serialCodeurManager);
-    odometry.setPosition(0, 0, 0);
+    odometry.setPosition(0,0,0);
 
     Controller controller(&odometry, &motorManager, &config);
-    //controller.setTargetXY(300, 300);
+    controller.setTargetXY(300, 300);
 
-    ActionManager actionManager(i2cS, 2);
-    actionManager.action(RES_PATH + "actions/simpleAX12Test.as");
+    //ActionManager actionManager(i2cS, 2);
+    //actionManager.action(RES_PATH + "actions/simpleAX12Test.as");
 
     bool strategyIsDone = false;
 
     timer asservTimer;
-    while(!strategyIsDone && totalTime.elapsed_s() < 4) {
+    while(!strategyIsDone && totalTime.elapsed_s() < 10) {
 
         if(asservTimer.elapsed_ms() >= deltaAsservTimer) {
 //            cout << totalTime.elapsed_us() << ";";
@@ -97,7 +94,7 @@ int main(int argc, char **argv) {
 
 //    cout << "-- Quitting the application :" << endl;
 //	cout << "Free memory ... ";
-    actionManager.close();
+    //actionManager.close();
     close(i2cM);
     close(i2cS);
     close(i2cSt);
