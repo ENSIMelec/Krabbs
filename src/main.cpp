@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
     Controller controller(&odometry, &motorManager, &config);
     //controller.setTargetXY(300, 300);
 
-    ActionManager actionManager(i2cS, 1);
+    ActionManager actionManager(i2cS, 2);
     actionManager.action(RES_PATH + "actions/simpleAX12Test.as");
 
     bool strategyIsDone = false;
