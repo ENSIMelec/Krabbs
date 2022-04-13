@@ -134,30 +134,30 @@ int AX12Manager::AX12Action(int numActionneur, int angleAction, int forceAction)
 	}
 */
 	//limite le couple
-	dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, DXL_ID, ADDR_AX_TORQUE_LIMIT, forceAction, &dxl_error);
+	dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, numActionneur, ADDR_AX_TORQUE_LIMIT, forceAction, &dxl_error);
 	if (dxl_comm_result != COMM_SUCCESS)
 	{
 		//packetHandler->printTxRxResult(dxl_comm_result);
-		std::cout << "Erreur COMM limitation couple " << DXL_ID << std::endl;
+		std::cout << "Erreur COMM limitation couple " << numActionneur << std::endl;
 	}
 	else if (dxl_error != 0)
 	{
 		//packetHandler->printRxPacketError(dxl_error);
-		std::cout << "Erreur limitation couple " << DXL_ID << std::endl;
+		std::cout << "Erreur limitation couple " << numActionneur << std::endl;
 	}
 
 	temps.restart();
     // Write goal position
-	dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, DXL_ID, ADDR_AX_GOAL_POSITION, dxl_goal_position, &dxl_error);
+	dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, numActionneur, ADDR_AX_GOAL_POSITION, dxl_goal_position, &dxl_error);
     if (dxl_comm_result != COMM_SUCCESS)
     {
       	//packetHandler->printTxRxResult(dxl_comm_result);
-		std::cout << "Erreur COMM ecriture angle " << DXL_ID << std::endl;
+		std::cout << "Erreur COMM ecriture angle " << numActionneur << std::endl;
     }
     else if (dxl_error != 0)
     {
      	//packetHandler->printRxPacketError(dxl_error);
-		std::cout << "Erreur ecriture angle " << DXL_ID << std::endl;
+		std::cout << "Erreur ecriture angle " << numActionneur << std::endl;
     }
     /* //Pas si utile que ça ... Il faudrait plutot faire une boucle "tant qu'on a pas une charge correspondant à la prise de cube dans les pinces ..."
     do {

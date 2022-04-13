@@ -32,7 +32,6 @@ using namespace dynamixel;
 // Default setting
 #define BAUDRATE                        1000000
 #define DEVICENAME                      "/dev/ttyACM0"      // Check which port is being used on your controller
-#define DXL_ID 4
 #define TORQUE_ENABLE 1
 #define TORQUE_DISABLE 0
 
