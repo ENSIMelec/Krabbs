@@ -5,6 +5,7 @@
 # Folders
 build
 cmake-build-krabbs
+src/base
 
 # Prerequisites
 *.d
