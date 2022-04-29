@@ -38,8 +38,6 @@ int main(int argc, char **argv) {
 //	cout << "Initializing the GPIO ... ";
 	wiringPiSetupGpio();
     int i2cM = wiringPiI2CSetup(I2C_MOTORS);
-
-    // TODO : find what these are for
     int i2cS = wiringPiI2CSetup(config.get_I2C_SERVOS());
     int i2cSt = wiringPiI2CSetup(9);
 
