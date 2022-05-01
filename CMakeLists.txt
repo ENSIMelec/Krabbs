@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.18.4)
 project(krabbs)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # Linking all the libraries in the lib folder
 link_directories(/usr/local/lib)
 link_directories(/usr/include)
-link_directories(/usr/include/c++/10)
+#link_directories(/usr/include/c++/10)
 
 # Adding executables
 file(GLOB SRC
