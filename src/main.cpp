@@ -3,7 +3,6 @@
 
 #include "base/Config.h"
 #include "base/MotorManager.h"
-#include "base/Utils.h"
 #include "base/Clock.h"
 #include "base/Odometry.h"
 #include "base/Point.h"
@@ -11,7 +10,7 @@
 #include "base/ActionManager.h"
 #include "base/StrategyParser.h"
 #include "base/Strategy.h"
-#include "base/Initialize.h"
+#include "base/Initializer.h"
 
 using namespace std;
 
@@ -19,53 +18,53 @@ using namespace std;
 #define EXIT_SUCCESS    0
 #define EXIT_FAIL_I2C   1
 
+#define MAX_TIME 10     // The maximum time the robot will run (in seconds)
+
 // This folder is used to load all the external resources (like configuration files)
 const string RES_PATH = "/home/pi/Documents/Krabbs/res/";
 
 int main(int argc, char **argv) {
 
-    Config *configuration = Initialize::start();
+    Config *configuration = Initializer::start();
 
     Strategy strategy(RES_PATH + "strategies/Jaune/", "main.strat");
     strategy.logObjectives();
 
-    unsigned int deltaAsservTimer = configuration->getDeltaAsserv();
+    Controller * controller = Initializer::getController();
+    Odometry * odometry = Initializer::getOdometry();
+
+    unsigned int updateTime = configuration->getDeltaAsserv();
     timer totalTime;
 
-    //    controller.setTargetXY(300, 300);
+    cout << "Started objective : " << strategy.getCurrentObjective()->getName() << endl;
+    Point * nextPoint = strategy.getCurrentPoint();  // The current point destination
+    nextPoint->logTargetInformation();
 
+    timer updateTimer;
+    while(!strategy.isDone() && totalTime.elapsed_s() < MAX_TIME) {
 
-//    //actionManager.action(RES_PATH + "actions/simpleAX12Test.as");
+        if(updateTimer.elapsed_ms() >= updateTime) {
+//            odometry->update();
+//            controller->update();
 
-//    timer asservTimer;
-//    while(!strategyIsDone && totalTime.elapsed_s() < 10) {
-//
-//        if(asservTimer.elapsed_ms() >= deltaAsservTimer) {
-////            cout << totalTime.elapsed_us() << ";";
-//
-//            odometry.update();
-//            controller.update();
-//
-//            if(controller.isTargetReached()) {
-//                cout << "Target reached !" << endl;
-//                controller.stopMotors();
-//                strategyIsDone = true;
-//            }
-//            asservTimer.restart();
-//        }
-//    }
-//
-////    cout << "Stopping motors " << endl;
-//    controller.stopMotors();
-//
-////    cout << "-- Quitting the application :" << endl;
-////	cout << "Free memory ... ";
-//    //actionManager.close();
-//    close(i2cM);
-//    close(i2cS);
-//    close(i2cSt);
-////    cout << "done" << endl;
+            if(controller->isTargetReached()) {
+                cout << "Point reached !" << endl;
+//                controller->stopMotors();
 
-//	cout << "-- End of the program" << endl;
+                // Go to the next point
+                nextPoint = strategy.getNextPoint();
+
+                if(!strategy.isDone()) {
+                    controller->setTargetPoint(nextPoint);
+                }
+            }
+            updateTimer.restart();
+        }
+    }
+
+    // Quitting the application
+    Initializer::end();
+
+	cout << "-- End of the program" << endl;
 	return EXIT_SUCCESS;
 }
