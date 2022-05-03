@@ -1,20 +1,20 @@
 /*
- * This program is used to get the tick number for each encoder wheel for Krabbs
- * see https://github.com/ENSIMelec/Krabbs
- * 
- * It uses the Serial Port to communicate with the RapsberryPi. 
- * 
- * TODO : Depending on the speed limit, it could be nice to use the I2C bus to communicate.
- * 
- * Author : Tom de Pasquale
- * 
- * Last updated : March 03 2022
- * Reformating the code to match with recomandations and adding comments.
- *
- */
+   This program is used to get the tick number for each encoder wheel for Krabbs
+   see https://github.com/ENSIMelec/Krabbs
+
+   It uses the Serial Port to communicate with the RapsberryPi.
+
+   TODO : Depending on the speed limit, it could be nice to use the I2C bus to communicate.
+
+   Author : Tom de Pasquale
+
+   Last updated : March 03 2022
+   Reformating the code to match with recomandations and adding comments.
+
+*/
 
 // Uncomment to activate debug mod
-//#define DEBUG
+#define DEBUG
 
 // Interrupt pins
 #define interLeftEncoder    0 //pin2 : interrupt 0 
@@ -23,12 +23,13 @@
 #define LEFT 0
 #define RIGHT 1
 
-uint8_t tickValues[2];
+volatile long tickValues[2];
+volatile long time;
 
 void setup()
 {
 #ifdef DEBUG
-  Serial.begin(9600);
+  Serial.begin(115200);
 #endif
 
   // Set the tick values to be 0 at start
@@ -42,6 +43,8 @@ void setup()
 /* Reset the tick values */
 void reset()
 {
+  time = micros();
+  
   tickValues[LEFT] = 0;
   tickValues[RIGHT] = 0;
 }
@@ -57,6 +60,25 @@ void loop()
   Serial.println(tickValues[RIGHT]);
 #endif
 
+  if (Serial.available()) {
+    int data = Serial.read();
+    switch (data) {
+      case 'C' :
+        time = micros();
+        Serial.print("?");
+        Serial.print(tickValues[LEFT]);
+        Serial.print(",");
+        Serial.print(tickValues[RIGHT]);
+        Serial.print(":");
+        Serial.print(time);
+        Serial.print(";");
+        break;
+
+      case 'R' :
+        reset();
+        break;
+    }
+  }
 }
 
 /* Increments or decrements the right tick value */
