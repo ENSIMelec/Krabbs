@@ -27,29 +27,41 @@ int main(int argc, char **argv) {
 
     Config *configuration = Initializer::start();
 
-    Strategy strategy(RES_PATH + "strategies/Jaune/", "main.strat");
+    Strategy strategy(RES_PATH + "strategies/Forward/", "main.strategy");
     strategy.logObjectives();
 
     Controller * controller = Initializer::getController();
     Odometry * odometry = Initializer::getOdometry();
 
-    unsigned int updateTime = configuration->getDeltaAsserv();
+    unsigned int updateTime = configuration->getUpdateTime();
     timer totalTime;
 
     cout << "Started objective : " << strategy.getCurrentObjective()->getName() << endl;
     Point * nextPoint = strategy.getCurrentPoint();  // The current point destination
+    cout << "First Point : " << endl;
     nextPoint->logTargetInformation();
 
+    // Set the initial position
+    odometry->setPosition(nextPoint->getX(), nextPoint->getY(), nextPoint->getTheta());
+
+    // Set first target
+    cout << "Second Point : " << endl;
+    nextPoint = strategy.getNextPoint();
+    nextPoint->logTargetInformation();
+    controller->setTargetPoint(nextPoint);
+
     timer updateTimer;
-    while(!strategy.isDone() && totalTime.elapsed_s() < MAX_TIME) {
+    while(!strategy.isDone() && totalTime.elapsed_s() < configuration->getMatchTime()) {
 
         if(updateTimer.elapsed_ms() >= updateTime) {
-//            odometry->update();
-//            controller->update();
+            cout << "New update" << endl;
+            odometry->update();
+            odometry->debug();
+            controller->update();
 
             if(controller->isTargetReached()) {
                 cout << "Point reached !" << endl;
-//                controller->stopMotors();
+                controller->stopMotors();
 
                 // Go to the next point
                 nextPoint = strategy.getNextPoint();
