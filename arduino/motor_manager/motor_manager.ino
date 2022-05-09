@@ -28,6 +28,12 @@
 // I2C address
 #define ADDR_I2C   8
 
+
+// Timeout
+#define TIMEOUT_DELAY_MS 1000
+uint16_t timeout_timer;
+
+
 void setup() {
 
 #ifdef DEBUG
@@ -67,6 +73,13 @@ void setup() {
 
 /* Empty loop function. We wait for an interruption to do something. */
 void loop() {
+  if(millis() > timeout_timer){
+    #ifdef DEBUG
+      Serial.println("TIMEOUT !!! Emergency stop");
+    #endif
+    stop();
+    
+  }
 }
 
 /* Function that stop the motors */
@@ -174,6 +187,7 @@ void recv(int numBytes) {
     uint8_t leftDirection = Wire.read();
     uint8_t rightDirection = Wire.read();
 
+    timeout_timer = millis() + TIMEOUT_DELAY_MS;
 #ifdef DEBUG
     Serial.print("PWM_Left : ");
     Serial.println(PWM_Left);
