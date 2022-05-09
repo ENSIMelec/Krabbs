@@ -4,11 +4,15 @@
 			"X": 0,
 			"Y": 0,
 			"angle": 0,
-			"type": "setXYTheta"
+			"type": "RecalageXY"
 		}, {
-			"X": -500,
+			"X": 500,
 			"Y": 0,
-			"type": "moveToPosition"
+			"type": "MoveToPosition",
+			"vitesse": 400,
+			"kP_curve": 1,
+			"smooth_curve": true,
+			"distance_threshold": 5
 		}
 	]
 }

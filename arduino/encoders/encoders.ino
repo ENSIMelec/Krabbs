@@ -1,4 +1,4 @@
-/*
+  /*
    This program is used to get the tick number for each encoder wheel for Krabbs
    see https://github.com/ENSIMelec/Krabbs
 
@@ -14,7 +14,7 @@
 */
 
 // Uncomment to activate debug mod
-#define DEBUG
+//#define DEBUG
 
 // Interrupt pins
 #define interLeftEncoder    0 //pin2 : interrupt 0 
@@ -28,9 +28,7 @@ volatile long time;
 
 void setup()
 {
-#ifdef DEBUG
   Serial.begin(115200);
-#endif
 
   // Set the tick values to be 0 at start
   reset();
@@ -44,12 +42,11 @@ void setup()
 void reset()
 {
   time = micros();
-  
+
   tickValues[LEFT] = 0;
   tickValues[RIGHT] = 0;
 }
 
-/* We are not using the for loop execpt for debug uses. The code only use interruptions. */
 void loop()
 {
 
@@ -61,7 +58,7 @@ void loop()
 #endif
 
   if (Serial.available()) {
-    int data = Serial.read();
+    char data = Serial.read();
     switch (data) {
       case 'C' :
         time = micros();
@@ -84,11 +81,13 @@ void loop()
 /* Increments or decrements the right tick value */
 void countRightTicks ()
 {
+  // Note : this has been swapped for Kiroulpa
+
   //if (digitalRead(CANAL_B_RIGHT) == HIGH)
   if (PINB & 0x01)
-    tickValues[RIGHT]--;
-  else
     tickValues[RIGHT]++;
+  else
+    tickValues[RIGHT]--;
 }
 
 /* Increments or decrements the right tick value */

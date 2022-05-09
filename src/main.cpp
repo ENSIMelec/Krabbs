@@ -1,16 +1,16 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "base/Config.h"
-#include "base/MotorManager.h"
-#include "base/Clock.h"
-#include "base/Odometry.h"
-#include "base/Point.h"
-#include "base/Controller.h"
-#include "base/ActionManager.h"
-#include "base/StrategyParser.h"
-#include "base/Strategy.h"
-#include "base/Initializer.h"
+#include "base/controller/MotorManager.h"
+#include "base/utility/Clock.h"
+#include "base/odometry/Odometry.h"
+#include "base/strategy/Point.h"
+#include "base/controller/Controller.h"
+#include "base/actuators/ActionManager.h"
+#include "base/strategy/StrategyParser.h"
+#include "base/strategy/Strategy.h"
+#include "base/utility/Initializer.h"
+#include "base/Lidar.h"
 
 using namespace std;
 
@@ -24,50 +24,61 @@ using namespace std;
 const string RES_PATH = "/home/pi/Documents/Krabbs/res/";
 
 int main(int argc, char **argv) {
-
-    Config *configuration = Initializer::start();
-
-    Strategy strategy(RES_PATH + "strategies/Forward/", "main.strategy");
-    strategy.logObjectives();
+    Configuration *configuration = Initializer::start();
 
     Controller * controller = Initializer::getController();
     Odometry * odometry = Initializer::getOdometry();
+    ActionManager * actionManager = Initializer::getActionManager();
 
-    unsigned int updateTime = configuration->getUpdateTime();
+    unsigned int updateTime = configuration->getInt("global.update_time");
     timer totalTime;
 
+    Strategy strategy(RES_PATH + "strategies/Forward/", "main.strategy");
     cout << "Started objective : " << strategy.getCurrentObjective()->getName() << endl;
-    Point * nextPoint = strategy.getCurrentPoint();  // The current point destination
-    cout << "First Point : " << endl;
-    nextPoint->logTargetInformation();
+    Point * currentPoint = strategy.getCurrentPoint();  // The current point destination
 
-    // Set the initial position
-    odometry->setPosition(nextPoint->getX(), nextPoint->getY(), nextPoint->getTheta());
+    // Set the initial location
+    odometry->setPosition(currentPoint->getX(), currentPoint->getY(), currentPoint->getTheta());
 
     // Set first target
-    cout << "Second Point : " << endl;
-    nextPoint = strategy.getNextPoint();
-    nextPoint->logTargetInformation();
-    controller->setTargetPoint(nextPoint);
+    currentPoint = strategy.getNextPoint();
+//    controller->setTargetXY((int) currentPoint->getX(), (int) currentPoint->getY());
+    controller->setNextPoint(currentPoint);
 
     timer updateTimer;
-    while(!strategy.isDone() && totalTime.elapsed_s() < configuration->getMatchTime()) {
+    while(!strategy.isDone() && totalTime.elapsed_s() < configuration->getInt("global.match_time")) {
 
         if(updateTimer.elapsed_ms() >= updateTime) {
-            cout << "New update" << endl;
+            if(Lidar::isActive()){
+                printf("Warning : %d | Danger : %d\n", Lidar::isWarning(), Lidar::isDanger());
+            }
+
             odometry->update();
             odometry->debug();
-            controller->update();
+
+            if(Lidar::isDanger()) {
+                controller->stopMotors();
+            } else {
+                controller->update();
+            }
+
+//            controller->debug();
 
             if(controller->isTargetReached()) {
                 cout << "Point reached !" << endl;
                 controller->stopMotors();
 
+                // Execute the action
+                if(currentPoint->isActionAfterMovement()) {
+                    string actionFile = currentPoint->getAction();
+                    if(actionFile != "null") actionManager->action(actionFile);
+                }
+
                 // Go to the next point
-                nextPoint = strategy.getNextPoint();
+                currentPoint = strategy.getNextPoint();
 
                 if(!strategy.isDone()) {
-                    controller->setTargetPoint(nextPoint);
+                    controller->setTargetXY((int) currentPoint->getX(), (int) currentPoint->getY());
                 }
             }
             updateTimer.restart();

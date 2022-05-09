@@ -2,9 +2,9 @@ global {
 	; Temps d’attente entre chaque boucle d’asservissement, en ms.
 	; Attention : une valeur trop élevée sature le bus I2C !
 	update_time 	10
-	match_time 		5
+	match_time 		50
 
-	nbAX12 			0
+	nb_AX12 		1
 }
 
 i2c {
@@ -13,36 +13,101 @@ i2c {
 	motors 8
 }
 
-asservissement {
-	; Réglages du PID
-	;pid d'angle en angle
+odometry {
+	wheel_diameter	36
 
-	;pid_kpa 25
-	;pid_kia 0.06
+
+	coeff_correcteur 	1
+	;coeff_correcteur	1.0011862
+	;coeff_correcteur	0.9953500
+	
+	; combien de tics par 1 tour de roue?
+	resolution	516
+	
+	; distance entre deux roue en mm
+	;entraxe	260
+	;entraxe	255
+	entraxe 	243
+
+	CoeffGLong 0.2132494620181157
+	CoeffDLong 0.2139313511526864
+
+	CoeffAngle 0.0510348738162745
+
+}
+
+controller {
+	; Acceleration angulaire
+	;acceleration_coeff 0.1
+
+	angle {
+
+	}
+
+	movement {
+		distance_threshold 5
+
+		Pk_angle 70
+		Pk_distance 1.2
+
+		acceleration 0.1
+	}
+
+	translation {
+		;Work for absolute angle position
+		;Pk_angle 160
+		;Pi_angle 0
+
+		; Pid for the angle correction when going straight
+		Pk_angle 70
+
+		Pk_distance 1.2
+	}
+}
+
+asservissement {
+	coeff_acceleration 0.05
+
+	; Réglages du PID
+
+	;pid d'angle en angle
+	;pid_kpa 7
+	;pid_kia 0.08
+	;pid_kda 45
+	;pid_kpa 7
+	;pid_kia 0.08
+	;pid_kda 30
+	;Milharo
+	;pid_kpa 40
+	;pid_kia 0.1
+	;pid_kda 45
+	;pid_kpa 40
+	;pid_kia 0.08
 	;pid_kda 45
 
-	;pid_kpa 30
-	;pid_kia 0
-	;pid_kda 5
+	pid_kpa 25
+	pid_kia 0.06
+	pid_kda 45
 
-	pid_kpa 1
-	pid_kia 0
-	pid_kda 1
 	
 	;pid d'angle en déplacement
+	;pid_kpdep 11
+	;pid_kidep 0
+	;pid_kddep 9
+	;vitesse 40 p:1.3
 
 	;pid_kpdep 		30
 	;pid_kidep 		0.8
 	;pid_kddep 		10
 
-	;au dela de 20 de p le pathfinding foire
-	pid_kpdepPathFinding	8
-	pid_kpdep 		30
+	pid_kpdep 		20
 	pid_kidep 		0
-	pid_kddep 		7
+	pid_kddep 		5
 
-
-	; pid de position
+	; pid de location
+	;pid_kppos 0.004
+	;pid_kipos 0
+	;pid_kdpos 0
 	pid_kppos 		2
 	pid_kipos 		0
 	pid_kdpos 		1
@@ -64,31 +129,42 @@ asservissement {
 	pid_kdV_high 	0
 
 	; Réglages coefs déplacement
+	;CoeffGLong 		0.2132196162046908
+	;CoeffDLong 		0.2134471718249733
+	;CoeffGLong 0.2124946876328092
+	;CoeffDLong 0.2131741632914091
 
-	;CoeffGLong 0.2192765113974
-	;CoeffDLong 0.2188427299703
+	CoeffGLong 0.2132494620181157
+	CoeffDLong 0.2139313511526864
 
-	;CoeffGLong 0.2204356846473029
-	;CoeffDLong 0.2209804419608839
 
-	;24/05/2019 initiaux
-	;CoeffGLong 0.2175127805414823
-	;CoeffDLong 0.2180503145536678
-	;CoeffGLong 0,2175127805414823
-	;CoeffDLong 0,2180503145536678
-
-	;trop
-	;CoeffGLong 0.2171502592405798
-	;CoeffDLong 0.2184137317445906
-
-	;calcule un sixieme
-	CoeffGLong 0.2174523603246652
-	CoeffDLong 0.2181108840854883
-	
 	;CoefAngle Solveur
 	;CoeffAngl 0.0511967234097018
 	;CoeffAngl 0.0510457284650833
 
+	pid_kpdepPathFinding 8
+
+	CoeffAngl 0.0510348738162745
 	CoeffAnglD 0.0518380923726007
 	CoeffAnglG 0.0518358531317495
+}
+
+ramp {
+	; ---------------------- acceleration distance --------------------------------------
+	distance_speed_max 150
+	distance_acceleration_max 2
+	distance_deceleration_max 2
+	
+	; Coeff déterminant le début de la rampe de décélération en distance
+	distance_anticipation_gain 42
+	; ---------------------- acceleration angle (unité PWM) ----------------------------
+	angle_speed_max 40
+	angle_acceleration_max 1
+	angle_deceleration_max 2
+	
+	; Coeff déterminant le début de la rampe de décélération en rotation
+	angle_anticipation_gain 9
+
+	distance_window 5
+	; ------------------------------------------------------------
 }
