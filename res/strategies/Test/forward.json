@@ -1,0 +1,19 @@
+{
+	"Points": [
+		{
+			"X": 0,
+			"Y": 0,
+			"angle": 0,
+			"type": "SetXYTheta"
+		}, {
+			"X": 300,
+			"Y": 0,
+			"type": "MoveToPosition"
+		}, {
+			"X": 0,
+			"Y": 0,
+			"type": "MoveToPosition",
+			"direction": "backward"
+		}
+	]
+}

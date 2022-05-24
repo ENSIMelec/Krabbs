@@ -1,0 +1,13 @@
+{
+	"Points": [
+		{
+			"X": 0,
+			"Y": 0,
+			"angle": 0,
+			"type": "SetXYTheta"
+		}, {
+			"time": 3000,
+			"type": "Wait"
+		}
+	]
+}

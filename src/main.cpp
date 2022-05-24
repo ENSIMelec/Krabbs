@@ -11,6 +11,11 @@
 #include "base/strategy/Strategy.h"
 #include "base/utility/Initializer.h"
 #include "base/Lidar.h"
+#include "ResistanceReader.h"
+#include "KrabbsInitializer.h"
+#include "MatchManager.h"
+#include "base/ui/UI.h"
+#include "base/utility/Utils.h"
 
 using namespace std;
 
@@ -18,69 +23,55 @@ using namespace std;
 #define EXIT_SUCCESS    0
 #define EXIT_FAIL_I2C   1
 
-#define MAX_TIME 10     // The maximum time the robot will run (in seconds)
-
-// This folder is used to load all the external resources (like configuration files)
-const string RES_PATH = "/home/pi/Documents/Krabbs/res/";
-
 int main(int argc, char **argv) {
-    Configuration *configuration = Initializer::start();
 
-    Controller * controller = Initializer::getController();
-    Odometry * odometry = Initializer::getOdometry();
-    ActionManager * actionManager = Initializer::getActionManager();
+    Configuration *configuration = KrabbsInitializer::start(false);
+    Controller * controller = KrabbsInitializer::getController();
+    Odometry * odometry = KrabbsInitializer::getOdometry();
+    MatchManager * matchManager = KrabbsInitializer::getMatchManager();
+
+    UI::initModules();
 
     unsigned int updateTime = configuration->getInt("global.update_time");
-    timer totalTime;
+    bool stopMotors = false;
 
-    Strategy strategy(RES_PATH + "strategies/Forward/", "main.strategy");
-    cout << "Started objective : " << strategy.getCurrentObjective()->getName() << endl;
-    Point * currentPoint = strategy.getCurrentPoint();  // The current point destination
+    // Waiting for JACK to be removed
+    UI::logAndRefresh("Waiting for jack to be removed");
+    while(!Utils::isJackRemoved()) {}
 
-    // Set the initial location
-    odometry->setPosition(currentPoint->getX(), currentPoint->getY(), currentPoint->getTheta());
+    UI::logAndRefresh("Starting the match !");
+    Initializer::startLidar();
 
-    // Set first target
-    currentPoint = strategy.getNextPoint();
-//    controller->setTargetXY((int) currentPoint->getX(), (int) currentPoint->getY());
-    controller->setNextPoint(currentPoint);
-
-    timer updateTimer;
-    while(!strategy.isDone() && totalTime.elapsed_s() < configuration->getInt("global.match_time")) {
+    Clock updateTimer;
+    while(!matchManager->isMatchDone()) {
 
         if(updateTimer.elapsed_ms() >= updateTime) {
-            if(Lidar::isActive()){
-                printf("Warning : %d | Danger : %d\n", Lidar::isWarning(), Lidar::isDanger());
+            UI::update();
+            UI::display();
+
+//            if(Lidar::isActive()){
+//                printf("Warning : %d | Danger : %d\n", Lidar::isWarning(), Lidar::isDanger());
+//            }
+            odometry->update();
+
+            // All the case we should stop the motors
+            stopMotors = false;
+            if(Initializer::isLidarActivated() && Lidar::isDanger()) {
+                stopMotors = true;
             }
 
-            odometry->update();
-            odometry->debug();
-
-            if(Lidar::isDanger()) {
+            // Update the controller and set the motor commands (unless the motors should be stopped)
+            if(stopMotors) {
                 controller->stopMotors();
             } else {
                 controller->update();
             }
 
-//            controller->debug();
-
             if(controller->isTargetReached()) {
-                cout << "Point reached !" << endl;
-                controller->stopMotors();
-
-                // Execute the action
-                if(currentPoint->isActionAfterMovement()) {
-                    string actionFile = currentPoint->getAction();
-                    if(actionFile != "null") actionManager->action(actionFile);
-                }
-
-                // Go to the next point
-                currentPoint = strategy.getNextPoint();
-
-                if(!strategy.isDone()) {
-                    controller->setTargetXY((int) currentPoint->getX(), (int) currentPoint->getY());
-                }
+                matchManager->next();
+//                controller->setNextPoint(nextPoint);
             }
+
             updateTimer.restart();
         }
     }
@@ -88,6 +79,5 @@ int main(int argc, char **argv) {
     // Quitting the application
     Initializer::end();
 
-	cout << "-- End of the program" << endl;
 	return EXIT_SUCCESS;
 }

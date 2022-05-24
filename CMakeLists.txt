@@ -15,7 +15,7 @@ find_package(Threads REQUIRED)
 # Adding executables
 file(GLOB SRC
         # Custom files (including main.cpp)
-        "src/*.h"
+        "sc/*.h"
         "src/*.cpp"
 
         # Base files for the robot
@@ -39,11 +39,15 @@ file(GLOB SRC
 
         "src/base/utility/*.cpp"
         "src/base/utility/*.h"
+
+        "src/base/ui/*.cpp"
+        "src/base/ui/*.h"
         )
 
 add_executable(krabbs ${SRC})
 
-# Linking wiringPi to the binary
-target_link_libraries(krabbs wiringPi)
-target_link_libraries(krabbs dxl_sbc_cpp)
+# Linking libraries
+target_link_libraries(krabbs wiringPi)        # For GPIO
+target_link_libraries(krabbs ncursesw)        # For console interface
+target_link_libraries(krabbs dxl_sbc_cpp)     # For the AX12
 target_link_libraries(krabbs Threads::Threads)
