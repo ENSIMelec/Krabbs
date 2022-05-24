@@ -1,15 +1,20 @@
-  /*
-   This program is used to get the tick number for each encoder wheel for Krabbs
-   see https://github.com/ENSIMelec/Krabbs
+/*
+  This program is used to get the tick number for each encoder wheel for Krabbs
+  see https://github.com/ENSIMelec/Krabbs
 
-   It uses the Serial Port to communicate with the RapsberryPi.
+  It uses the Serial Port to communicate with the RapsberryPi.
 
-   TODO : Depending on the speed limit, it could be nice to use the I2C bus to communicate.
+  TODO : Depending on the speed limit, it could be nice to use the I2C bus to communicate.
 
-   Author : Tom de Pasquale
+  Protocol :
+  // [StartByte]     [LSB][][][MSB]      [LSB][][][MSB]      [LSB][][][MSB]      [StopByte]
+  //                   leftTicks           rightTicks         elapsedTime
 
-   Last updated : March 03 2022
-   Reformating the code to match with recomandations and adding comments.
+
+  Author : Tom de Pasquale
+
+  Last updated : May 14 2022
+  Changing the protocol to use bytes instead of strings
 
 */
 
@@ -25,6 +30,11 @@
 
 volatile long tickValues[2];
 volatile long time;
+
+#define COMMAND_READ_AND_RESET  0xFF
+#define COMMAND_RESET           0xF0
+#define START_BYTE              0xA5
+#define STOP_BYTE               0x5A
 
 void setup()
 {
@@ -58,20 +68,32 @@ void loop()
 #endif
 
   if (Serial.available()) {
-    char data = Serial.read();
+    unsigned int data = Serial.read();
     switch (data) {
-      case 'C' :
-        time = micros();
-        Serial.print("?");
-        Serial.print(tickValues[LEFT]);
-        Serial.print(",");
-        Serial.print(tickValues[RIGHT]);
-        Serial.print(":");
-        Serial.print(time);
-        Serial.print(";");
+      case COMMAND_READ_AND_RESET :
+        time = millis();
+
+        Serial.write(START_BYTE);
+        
+        Serial.write(tickValues[LEFT]);
+        Serial.write(tickValues[LEFT] >> 8);
+        Serial.write(tickValues[LEFT] >> 16);
+        Serial.write(tickValues[LEFT] >> 24);
+
+        Serial.write(tickValues[RIGHT]);
+        Serial.write(tickValues[RIGHT] >> 8);
+        Serial.write(tickValues[RIGHT] >> 16);
+        Serial.write(tickValues[RIGHT] >> 24);
+
+        Serial.write(time);
+        Serial.write(time >> 8);
+        Serial.write(time >> 16);
+        Serial.write(time >> 24);
+
+        Serial.write(STOP_BYTE);
         break;
 
-      case 'R' :
+      case COMMAND_RESET :
         reset();
         break;
     }

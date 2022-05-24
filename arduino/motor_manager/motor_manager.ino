@@ -33,7 +33,6 @@
 #define TIMEOUT_DELAY_MS 1000
 uint16_t timeout_timer;
 
-
 void setup() {
 
 #ifdef DEBUG
@@ -77,7 +76,7 @@ void loop() {
     #ifdef DEBUG
       Serial.println("TIMEOUT !!! Emergency stop");
     #endif
-    stop();
+    //stop();
     
   }
 }
